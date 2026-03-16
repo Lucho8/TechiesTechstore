@@ -1,6 +1,7 @@
 import { useCart } from "../context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 import PaymentModal from "../components/PaymentModal";
 import { useState } from "react";
 
@@ -33,7 +34,9 @@ const Cart = () => {
       });
 
       if (response.ok) {
-        alert("¡Compra realizada con éxito! Gracias por elegir Techies.");
+        toast.success(
+          "¡Compra realizada con éxito! Gracias por elegir Techies.",
+        );
         clearCart();
         navigate("/");
       }
@@ -45,7 +48,7 @@ const Cart = () => {
   // Esta es la nueva función que se ejecuta al tocar "Finalizar Compra"
   const handleCheckoutClick = () => {
     if (!user) {
-      alert("Necesitas iniciar sesión para finalizar tu compra");
+      toast.error("Necesitás iniciar sesión para finalizar tu compra");
       return navigate("/login", { state: { from: "/cart" } });
     }
     // Si está logueado, abrimos la ventanita mágica en vez de ir directo al back

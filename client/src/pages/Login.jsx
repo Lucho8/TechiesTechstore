@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ function Register() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const destination = location.state?.from || '/';
+  const destination = location.state?.from || "/";
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -105,6 +105,15 @@ function Register() {
             className="text-violet-400 hover:text-violet-300 font-medium"
           >
             Registráte acá
+          </Link>
+        </p>
+
+        <p className="text-slate-400 text-center mt-6 text-sm">
+          <Link
+            to="/forgot-password"
+            className="text-violet-400 hover:text-violet-300 font-medium"
+          >
+            Me olvide mi contraseña
           </Link>
         </p>
       </div>

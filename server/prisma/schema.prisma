@@ -14,13 +14,16 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
-  role      Role     @default(CLIENT) // Usamos un Enum para mayor seguridad
-  createdAt DateTime @default(now())
-  orders    Order[]  // Un usuario tiene muchas órdenes
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  password         String
+  name             String?
+  role             Role      @default(CLIENT)
+  createdAt        DateTime  @default(now())
+  resetToken       String?   
+  resetTokenExpiry DateTime? 
+  orders           Order[]
+  reviews          Review[]
 }
 
 enum Role {
@@ -31,21 +34,22 @@ enum Role {
 model Product {
   id          Int         @id @default(autoincrement())
   name        String
-  slug        String      @unique // Para URLs amigables (ej: teclado-rgb)
+  slug        String      @unique 
   description String
-  price       Decimal     @db.Decimal(10, 2) // Decimal es mejor para dinero que Float
+  price       Decimal     @db.Decimal(10, 2) 
   image       String?
   stock       Int
   categoryId  Int
   category    Category    @relation(fields: [categoryId], references: [id])
-  orderItems  OrderItem[] // Relación con los ítems comprados
+  orderItems  OrderItem[] 
   createdAt   DateTime    @default(now())
+  reviews     Review[]    
 }
 
 model Category {
   id       Int       @id @default(autoincrement())
   name     String    @unique
-  products Product[] // Una categoría tiene muchos productos
+  products Product[] 
 }
 
 model Order {
@@ -65,5 +69,16 @@ model OrderItem {
   productId Int
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
-  price     Decimal @db.Decimal(10, 2) // Precio congelado al momento de comprar
+  price     Decimal @db.Decimal(10, 2) 
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int      
+  comment   String   
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

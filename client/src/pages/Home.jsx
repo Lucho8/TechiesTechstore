@@ -1,100 +1,292 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
 
 function Home() {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]); // 👈 Nuevo estado para las categorías
-  const [selectedCategory, setSelectedCategory] = useState("all"); // 👈 Estado para el filtro activo
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+
+  const [globalMinMax, setGlobalMinMax] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // 👈 NUEVO ESTADO: Controla la "carrera" de datos
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
-    // Usamos Promise.all para traer Productos y Categorías al mismo tiempo
-    const fetchData = async () => {
+    const initData = async () => {
       try {
-        const [productsRes, categoriesRes] = await Promise.all([
-          fetch("http://localhost:3000/api/products"),
+        // Traemos categorías y precios al mismo tiempo, y ESPERAMOS a que ambos terminen
+        const [catRes, priceRes] = await Promise.all([
           fetch("http://localhost:3000/api/categories"),
+          fetch("http://localhost:3000/api/products/price-range"),
         ]);
 
-        const productsData = await productsRes.json();
-        const categoriesData = await categoriesRes.json();
+        const cats = await catRes.json();
+        const prices = await priceRes.json();
 
-        setProducts(productsData);
-        setCategories(categoriesData);
+        setCategories(cats);
+
+        // 👈 PROTECCIÓN EXTRA: Si la DB está vacía o falla, forzamos números válidos
+        const min = prices.min != null ? Number(prices.min) : 0;
+        const max =
+          prices.max != null && prices.max > 0 ? Number(prices.max) : 100000;
+
+        setGlobalMinMax([min, max]);
+        setPriceRange([min, max]);
+
+        // Ya tenemos el rango de precio real, damos luz verde
+        setIsReady(true);
       } catch (error) {
-        console.error("Error cargando la tienda:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error inicializando:", error);
+        setIsReady(true);
       }
     };
 
-    fetchData();
+    initData();
   }, []);
 
-  // 🧠 LÓGICA DE FILTRADO: Antes de dibujar, vemos qué botón tocó el usuario
-  const filteredProducts = products.filter(
-    (product) =>
-      selectedCategory === "all" || product.categoryId === selectedCategory,
-  );
+  const fetchProducts = async (
+    e,
+    overrideFilters = null,
+    targetPage = page,
+  ) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+
+    try {
+      const queryParams = new URLSearchParams();
+
+      const currentSearch = overrideFilters ? overrideFilters.search : search;
+      const currentCategory = overrideFilters
+        ? overrideFilters.category
+        : category;
+      const currentMin = overrideFilters
+        ? overrideFilters.minPrice
+        : priceRange[0];
+      const currentMax = overrideFilters
+        ? overrideFilters.maxPrice
+        : priceRange[1];
+
+      if (currentSearch) queryParams.append("search", currentSearch);
+      if (currentCategory) queryParams.append("category", currentCategory);
+      if (currentMin !== null && currentMin !== undefined)
+        queryParams.append("minPrice", currentMin);
+      if (currentMax !== null && currentMax !== undefined)
+        queryParams.append("maxPrice", currentMax);
+
+      queryParams.append("page", targetPage);
+      queryParams.append("limit", 6);
+
+      const res = await fetch(
+        `http://localhost:3000/api/products?${queryParams.toString()}`,
+      );
+      const data = await res.json();
+
+      setProducts(data.products || []);
+      setTotalPages(data.totalPages || 1);
+      setPage(data.currentPage || 1);
+    } catch (error) {
+      console.error("Error trayendo productos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 👈 MAGIA: Solo buscamos productos si 'isReady' es verdadero
+  useEffect(() => {
+    if (isReady) {
+      fetchProducts(null, null, page);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, isReady]);
+
+  const handleFilterSubmit = (e) => {
+    e.preventDefault();
+    setPage(1);
+    fetchProducts(e, null, 1);
+  };
+
+  const clearFilters = () => {
+    setSearch("");
+    setCategory("");
+    setPriceRange([...globalMinMax]);
+    setPage(1);
+    fetchProducts(
+      null,
+      {
+        search: "",
+        category: "",
+        minPrice: globalMinMax[0],
+        maxPrice: globalMinMax[1],
+      },
+      1,
+    );
+  };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 mb-20">
-      {/* 🦸‍♂️ HERO SECTION (El banner principal) */}
-      <div className="bg-linear-to-r from-violet-900 to-slate-900 rounded-2xl p-8 sm:p-12 mb-10 border border-violet-800/50 shadow-2xl flex flex-col items-center text-center">
-        <h1 className="text-4xl sm:text-6xl font-extrabold text-white mb-4 tracking-tight">
-          El paraíso del <span className="text-violet-400">Setup Perfecto</span>
-        </h1>
-        <p className="text-slate-300 text-lg sm:text-xl max-w-2xl">
-          Encontrá los mejores periféricos, componentes y accesorios para llevar
-          tu experiencia al siguiente nivel.
-        </p>
-      </div>
-
-      {/* 🎛️ FILTROS POR CATEGORÍA */}
-      <div className="mb-10">
-        <h2 className="text-2xl font-bold text-white mb-4 border-l-4 border-violet-500 pl-4">
-          Explorar por categoría
+    <div className="max-w-7xl mx-auto p-4 flex flex-col md:flex-row gap-8 mb-20">
+      {/* 🎛️ PANEL DE FILTROS */}
+      <div className="w-full md:w-1/4 bg-slate-800 p-6 rounded-2xl border border-slate-700 h-fit sticky top-24 shadow-2xl">
+        <h2 className="text-xl font-bold text-white mb-6 border-b border-slate-700 pb-2">
+          Filtros de Búsqueda
         </h2>
-        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
-          <button
-            onClick={() => setSelectedCategory("all")}
-            className={`px-5 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all shadow-md ${selectedCategory === "all" ? "bg-violet-600 text-white shadow-violet-500/30" : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"}`}
-          >
-            🔥 Todo el catálogo
-          </button>
 
-          {/* Generamos un botón por cada categoría que viene de la base de datos */}
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-5 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all shadow-md ${selectedCategory === cat.id ? "bg-violet-600 text-white shadow-violet-500/30" : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"}`}
+        <form onSubmit={handleFilterSubmit} className="space-y-6">
+          <div>
+            <label className="text-sm text-slate-400 block mb-2">
+              ¿Qué estás buscando?
+            </label>
+            <input
+              type="text"
+              placeholder="Ej: Teclado..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-3 outline-none focus:border-violet-500 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-slate-400 block mb-2">
+              Categoría
+            </label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-3 outline-none focus:border-violet-500 transition-colors"
             >
-              {cat.name}
-            </button>
-          ))}
-        </div>
+              <option value="">Todas las categorías</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="pb-4">
+            <label className="text-sm text-slate-400 block mb-6">
+              Rango de Precio:{" "}
+              <span className="text-violet-400 font-bold">
+                ${priceRange[0]} - ${priceRange[1]}
+              </span>
+            </label>
+            <Slider
+              range
+              min={globalMinMax[0]}
+              max={globalMinMax[1]}
+              value={priceRange}
+              onChange={(newRange) => setPriceRange(newRange)}
+              trackStyle={[{ backgroundColor: "#8b5cf6", height: 8 }]}
+              handleStyle={[
+                {
+                  borderColor: "#8b5cf6",
+                  height: 20,
+                  width: 20,
+                  marginTop: -6,
+                  backgroundColor: "white",
+                  opacity: 1,
+                  boxShadow: "none",
+                  cursor: "grab",
+                },
+                {
+                  borderColor: "#8b5cf6",
+                  height: 20,
+                  width: 20,
+                  marginTop: -6,
+                  backgroundColor: "white",
+                  opacity: 1,
+                  boxShadow: "none",
+                  cursor: "grab",
+                },
+              ]}
+              railStyle={{ backgroundColor: "#334155", height: 8 }}
+            />
+            <div className="flex justify-between text-xs text-slate-500 mt-4 font-mono">
+              <span>Mín: ${globalMinMax[0]}</span>
+              <span>Máx: ${globalMinMax[1]}</span>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 rounded-lg transition-colors shadow-lg shadow-violet-500/30"
+          >
+            🔍 Aplicar Filtros
+          </button>
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-colors"
+          >
+            🧹 Limpiar
+          </button>
+        </form>
       </div>
 
-      {/* 📦 ESTADO DE CARGA O GRILLA DE PRODUCTOS */}
-      {loading ? (
-        <div className="text-center py-20 text-violet-400 text-xl animate-pulse font-bold">
-          Cargando catálogo... 🚀
-        </div>
-      ) : filteredProducts.length === 0 ? (
-        <div className="text-center bg-slate-800 rounded-xl p-10 border border-slate-700">
-          <p className="text-slate-400 text-lg">
-            No hay productos en esta categoría por ahora. 😢
-          </p>
-        </div>
-      ) : (
-        /* Le subí a grid-cols-4 en pantallas grandes (xl) para aprovechar el espacio del max-w-7xl */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+      {/* 🛍️ CATÁLOGO DE PRODUCTOS */}
+      <div className="w-full md:w-3/4 flex flex-col">
+        {loading ? (
+          <div className="text-center py-20 text-violet-400 text-xl animate-pulse font-bold">
+            Buscando en el inventario... 🚀
+          </div>
+        ) : products.length === 0 ? (
+          <div className="bg-slate-800 p-12 rounded-3xl border border-slate-700 text-center shadow-2xl mt-10">
+            <span className="text-6xl mb-4 block">🕵️‍♂️</span>
+            <h3 className="text-2xl font-bold text-white mb-2">
+              No encontramos nada
+            </h3>
+            <p className="text-slate-400">
+              Probá buscando con otras palabras o ampliando el rango de precio.
+            </p>
+            <button
+              onClick={clearFilters}
+              className="mt-6 text-violet-400 font-bold hover:underline"
+            >
+              Ver todos los productos
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* 👇 ACA AGREGAMOS EL 'content-start' PARA QUE NO SE ESTIREN LAS TARJETAS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-1 content-start">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="mt-12 flex items-center justify-center gap-4 bg-slate-800 p-4 rounded-xl border border-slate-700 w-fit mx-auto shadow-lg">
+                <button
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-violet-600 transition-colors font-bold"
+                >
+                  ← Anterior
+                </button>
+                <span className="text-slate-300 font-medium">
+                  Página <strong className="text-white">{page}</strong> de{" "}
+                  <strong className="text-white">{totalPages}</strong>
+                </span>
+                <button
+                  onClick={() => setPage(page + 1)}
+                  disabled={page === totalPages}
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-violet-600 transition-colors font-bold"
+                >
+                  Siguiente →
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,66 +1,202 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 function AdminCategories() {
-  const [categories, setCategories] = useState([])
-  const [newName, setNewName] = useState("")
+  const [categories, setCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // 👈 NUEVOS ESTADOS PARA LA EDICIÓN
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState("");
 
   useEffect(() => {
-    fetchCategories()
-  }, [])
+    fetchCategories();
+  }, []);
 
   const fetchCategories = async () => {
-    const res = await fetch('http://localhost:3000/api/categories')
-    const data = await res.json()
-    setCategories(data)
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!newName) return
-
-    const res = await fetch('http://localhost:3000/api/categories', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newName })
-    })
-
-    if (res.ok) {
-      setNewName("")
-      fetchCategories() // Recargamos la lista
+    try {
+      const res = await fetch("http://localhost:3000/api/categories");
+      const data = await res.json();
+      setCategories(data);
+    } catch (error) {
+      toast.error("Error al cargar categorías");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+    if (!newCategory.trim()) return;
+
+    try {
+      const res = await fetch("http://localhost:3000/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newCategory }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCategories([...categories, data]);
+        setNewCategory("");
+        toast.success("Categoría creada con éxito 📁");
+      } else {
+        toast.error("Error al crear la categoría");
+      }
+    } catch (error) {
+      toast.error("Error de conexión");
+    }
+  };
+
+  // 👈 FUNCIÓN PARA BORRAR (Con protección anti-explosiones)
+  const handleDelete = async (id) => {
+    if (!window.confirm("¿Seguro que querés borrar esta categoría?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/categories/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(data.message);
+        setCategories(categories.filter((c) => c.id !== id));
+      } else {
+        // Acá mostramos el error si la categoría tiene productos adentro
+        toast.error(data.error || "No se pudo borrar");
+      }
+    } catch (error) {
+      toast.error("Error de conexión");
+    }
+  };
+
+  // 👈 FUNCIONES PARA EDITAR
+  const startEditing = (category) => {
+    setEditingId(category.id);
+    setEditName(category.name);
+  };
+
+  const handleSaveEdit = async (id) => {
+    if (!editName.trim()) return toast.error("El nombre no puede estar vacío");
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/categories/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: editName }),
+      });
+
+      if (res.ok) {
+        toast.success("Categoría actualizada ✏️");
+        setCategories(
+          categories.map((c) => (c.id === id ? { ...c, name: editName } : c)),
+        );
+        setEditingId(null);
+      } else {
+        toast.error("Error al actualizar");
+      }
+    } catch (error) {
+      toast.error("Error de conexión");
+    }
+  };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-slate-800 rounded-xl shadow-xl border border-slate-700">
-      <h2 className="text-2xl font-bold text-white mb-6">Gestionar Categorías</h2>
+    <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl">
+      <h2 className="text-2xl font-bold text-white mb-6 border-b border-slate-700 pb-4">
+        Gestión de Categorías
+      </h2>
 
-      {/* FORMULARIO DE CREACIÓN */}
-      <form onSubmit={handleSubmit} className="flex gap-2 mb-8">
-        <input 
+      {/* Formulario para agregar nueva */}
+      <form onSubmit={handleAddCategory} className="flex gap-4 mb-8">
+        <input
           type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          placeholder="Nueva categoría (ej: Sillas)"
-          className="flex-1 bg-slate-900 border border-slate-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+          placeholder="Nueva categoría (ej: Monitores)"
+          className="flex-1 bg-slate-900 text-white border border-slate-600 rounded-lg p-3 outline-none focus:border-violet-500 transition-colors"
         />
-        <button className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-3 rounded-lg font-bold transition-all">
-          Agregar
+        <button
+          type="submit"
+          disabled={!newCategory.trim()}
+          className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+        >
+          + Agregar
         </button>
       </form>
 
-      {/* LISTADO */}
-      <div className="space-y-3">
-        {categories.map(cat => (
-          <div key={cat.id} className="flex justify-between items-center p-4 bg-slate-900 rounded-lg border border-slate-700">
-            <span className="text-white font-medium">{cat.name}</span>
-            <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded-full border border-slate-700">
-              {cat._count?.products || 0} productos
-            </span>
-          </div>
-        ))}
-      </div>
+      {/* Tabla/Lista de categorías */}
+      {loading ? (
+        <p className="text-violet-400 animate-pulse font-bold text-center">
+          Cargando...
+        </p>
+      ) : categories.length === 0 ? (
+        <p className="text-slate-400 text-center py-4">
+          No hay categorías creadas.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className="flex items-center justify-between bg-slate-900 p-4 rounded-lg border border-slate-700"
+            >
+              {/* Modo Edición vs Modo Vista */}
+              {editingId === category.id ? (
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  autoFocus
+                  className="flex-1 bg-slate-800 text-white border border-violet-500 rounded p-2 outline-none mr-4"
+                />
+              ) : (
+                <span className="text-white font-medium flex-1">
+                  {category.name}
+                </span>
+              )}
+
+              {/* Botonera dinámica */}
+              <div className="flex gap-2">
+                {editingId === category.id ? (
+                  <>
+                    <button
+                      onClick={() => handleSaveEdit(category.id)}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold transition-colors text-sm"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded font-bold transition-colors text-sm"
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => startEditing(category)}
+                      className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded font-bold transition-colors text-sm"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(category.id)}
+                      className="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded font-bold transition-colors text-sm"
+                    >
+                      Borrar
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
-export default AdminCategories
+export default AdminCategories;

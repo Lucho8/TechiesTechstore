@@ -3,6 +3,16 @@ const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 // POST /api/orders - Finalizar compra
 router.post("/", async (req, res) => {
   const { userId, cartItems, total } = req.body;
@@ -25,6 +35,45 @@ router.post("/", async (req, res) => {
           },
         },
       });
+
+      const userDb = await prisma.user.findUnique({
+        where: { id: Number(userId) },
+      });
+
+      if (userDb) {
+        // 2. Armamos el diseño del correo (podés ponerle HTML para que quede lindo)
+        const mailOptions = {
+          from: `"Techies Store" <${process.env.EMAIL_USER}>`,
+          to: userDb.email, // Se lo mandamos al correo con el que se registró
+          subject: "¡Confirmación de tu compra en Techies! 🚀",
+          html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
+            <h1 style="color: #7c3aed; text-align: center;">¡Gracias por tu compra, ${userDb.name || "Techie"}!</h1>
+            <p style="font-size: 16px; color: #333;">Recibimos tu orden correctamente. Acá tenés los detalles:</p>
+            
+            <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0; font-size: 18px;">Total pagado: <strong style="color: #10b981;">$${total}</strong></p>
+              <p style="margin: 5px 0 0 0; color: #64748b;">Estado: Preparando envío 📦</p>
+            </div>
+            
+            <p style="font-size: 14px; color: #64748b; text-align: center;">
+              Si tenés alguna duda, respondé a este correo. <br>
+              ¡Que disfrutes tu nuevo setup!
+            </p>
+          </div>
+        `,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.error("Error enviando el mail:", error);
+          } else {
+            console.log(
+              "¡Mail de confirmación enviado a " + userDb.email + "!",
+            );
+          }
+        });
+      }
 
       // 2. ACTUALIZAR EL STOCK DE CADA PRODUCTO
       // Usamos un bucle for...of para asegurar que Prisma espere cada actualización

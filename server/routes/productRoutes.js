@@ -2,9 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { verifyAdmin } = require('../middleware/auth');
-
-
+const { verifyAdmin } = require("../middleware/auth");
 
 const slugify = (text) => {
   return text
@@ -21,17 +19,114 @@ const slugify = (text) => {
 // GET /api/products
 router.get("/", async (req, res) => {
   try {
-    const products = await prisma.product.findMany({
-      include: {
-        category: true, // ¡Truco Pro! Traemos el nombre de la categoría también
-      },
-      orderBy: {
-        id: "asc", // Esto los mantiene siempre ordenados por su ID de menor a mayor
-      },
+    const {
+      search,
+      category,
+      minPrice,
+      maxPrice,
+      page = 1,
+      limit = 6,
+    } = req.query;
+
+    let whereClause = {};
+
+    if (search) {
+      whereClause.name = {
+        contains: search,
+        mode: "insensitive",
+      };
+    }
+
+    if (category) {
+      whereClause.categoryId = Number(category);
+    }
+
+    if (minPrice || maxPrice) {
+      whereClause.price = {};
+      if (minPrice) whereClause.price.gte = Number(minPrice);
+      if (maxPrice) whereClause.price.lte = Number(maxPrice);
+    }
+
+    // --- MAGIA DE LA PAGINACIÓN ---
+    const currentPage = Number(page);
+    const productsPerPage = Number(limit);
+    const skip = (currentPage - 1) * productsPerPage;
+
+    // Hacemos DOS consultas al mismo tiempo
+    const [products, totalProducts] = await Promise.all([
+      prisma.product.findMany({
+        where: whereClause,
+        include: { category: true },
+        orderBy: { createdAt: "desc" },
+        skip: skip,
+        take: productsPerPage, // Solo traemos los que pide el limit
+      }),
+      prisma.product.count({ where: whereClause }),
+    ]);
+
+    // Calculamos el total de páginas
+    const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+    // DEVOLVEMOS EL OBJETO ESTRUCTURADO QUE EL FRONTEND ESPERA
+    res.json({
+      products: products,
+      totalPages: totalPages,
+      currentPage: currentPage,
+      totalProducts: totalProducts,
     });
-    res.json(products);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener productos" });
+    console.error("Error trayendo productos:", error);
+    res
+      .status(500)
+      .json({ error: "Error en el servidor al filtrar productos" });
+  }
+});
+
+router.get("/price-range", async (req, res) => {
+  try {
+    const stats = await prisma.product.aggregate({
+      _min: { price: true },
+      _max: { price: true },
+    });
+
+    res.json({
+      min: Number(stats._min.price) || 0,
+      max: Number(stats._max.price) || 100000, // Por si la base está vacía
+    });
+  } catch (error) {
+    console.error("Error buscando rango de precios:", error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+
+router.get("/related/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // 1. Buscamos el producto actual para saber de qué categoría es
+    const currentProduct = await prisma.product.findUnique({
+      where: { slug: slug },
+    });
+
+    if (!currentProduct) {
+      return res.json([]); // Si no existe, devolvemos un array vacío
+    }
+
+    // 2. Buscamos otros de la misma categoría, excluyendo el actual
+    const relatedProducts = await prisma.product.findMany({
+      where: {
+        categoryId: currentProduct.categoryId,
+        slug: { not: slug }, // Magia de Prisma: "Que el slug NO sea el actual"
+      },
+      take: 4, // Solo queremos 4 sugerencias como máximo
+      include: { category: true },
+    });
+
+    res.json(relatedProducts);
+  } catch (error) {
+    console.error("Error al buscar productos relacionados:", error);
+    res.status(500).json({ error: "Error en el servidor" });
   }
 });
 
@@ -42,7 +137,18 @@ router.get("/:slug", async (req, res) => {
   try {
     const product = await prisma.product.findUnique({
       where: { slug: slug },
-      include: { category: true },
+      include: {
+        category: true,
+        // 👇 AGREGAMOS ESTO PARA TRAER LAS RESEÑAS
+        reviews: {
+          include: {
+            user: {
+              select: { name: true }, // Solo traemos el nombre, nada de contraseñas
+            },
+          },
+          orderBy: { createdAt: "desc" }, // Las más nuevas arriba
+        },
+      },
     });
 
     if (!product) {
@@ -145,5 +251,40 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: "No se pudo actualizar el producto." });
   }
 });
+
+// ---------------------------------------------------
+// OBTENER PRODUCTOS RELACIONADOS (GET /api/products/related/:slug)
+// ---------------------------------------------------
+
+router.post("/:id/reviews", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment, userId } = req.body;
+
+    // Validamos que no nos manden información vacía
+    if (!rating || !comment || !userId) {
+      return res
+        .status(400)
+        .json({ error: "Faltan datos para crear la reseña" });
+    }
+
+    // Le decimos a Prisma que guarde la reseña
+    const newReview = await prisma.review.create({
+      data: {
+        rating: Number(rating),
+        comment: comment,
+        productId: Number(id),
+        userId: Number(userId),
+      },
+    });
+
+    res.status(201).json(newReview);
+  } catch (error) {
+    console.error("Error al guardar la reseña:", error);
+    res.status(500).json({ error: "Error interno al guardar la reseña" });
+  }
+});
+
+
 
 module.exports = router;

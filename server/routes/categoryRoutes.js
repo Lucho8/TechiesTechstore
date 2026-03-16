@@ -30,4 +30,57 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: "El nombre no puede estar vacío" });
+    }
+
+    const updatedCategory = await prisma.category.update({
+      where: { id: Number(id) },
+      data: { name: name.trim() }
+    });
+
+    res.json({ message: "Categoría actualizada", category: updatedCategory });
+  } catch (error) {
+    console.error("Error al editar categoría:", error);
+    res.status(500).json({ error: "Error al editar la categoría" });
+  }
+});
+
+// ---------------------------------------------------
+// BORRAR UNA CATEGORÍA (DELETE /api/categories/:id)
+// ---------------------------------------------------
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. PRIMERO REVISAMOS SI HAY PRODUCTOS USANDO ESTA CATEGORÍA
+    const productsCount = await prisma.product.count({
+      where: { categoryId: Number(id) }
+    });
+
+    // Si hay productos, frenamos todo y avisamos
+    if (productsCount > 0) {
+      return res.status(400).json({ 
+        error: `No podés borrar esta categoría porque tiene ${productsCount} producto(s) adentro. Cambialos de categoría primero.` 
+      });
+    }
+
+    // 2. SI ESTÁ VACÍA, LA BORRAMOS SIN PIEDAD
+    await prisma.category.delete({
+      where: { id: Number(id) }
+    });
+
+    res.json({ message: "Categoría eliminada con éxito 🗑️" });
+  } catch (error) {
+    console.error("Error al borrar categoría:", error);
+    res.status(500).json({ error: "Error al borrar la categoría" });
+  }
+});
+
+
 module.exports = router;
