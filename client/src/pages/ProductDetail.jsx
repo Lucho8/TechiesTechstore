@@ -5,6 +5,8 @@ import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import ProductCard from "../components/ProductCard";
 
+import { API_URL } from "../utils/api";
+
 function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -65,18 +67,15 @@ function ProductDetail() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(
-        `${API_URL}/api/products/${product.id}/reviews`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            rating,
-            comment,
-            userId: user.id,
-          }),
-        },
-      );
+      const res = await fetch(`${API_URL}/api/products/${product.id}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rating,
+          comment,
+          userId: user.id,
+        }),
+      });
 
       if (res.ok) {
         const newReview = await res.json();

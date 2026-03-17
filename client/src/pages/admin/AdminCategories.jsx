@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
+import { API_URL } from "../../utils/api";
+
 function AdminCategories() {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState("");

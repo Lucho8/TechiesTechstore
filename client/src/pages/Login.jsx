@@ -3,7 +3,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useLocation } from "react-router-dom";
 
-function Register() {
+import { API_URL } from "../utils/api";
+
+function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",

@@ -3,6 +3,8 @@ import ProductCard from "../components/ProductCard";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 
+import { API_URL } from "../utils/api";
+
 function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);

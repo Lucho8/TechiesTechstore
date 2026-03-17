@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import MyOrders from "./MyOrders";
-import { Link } from "react-router-dom"; 
-import toast from "react-hot-toast"; 
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+
+import { API_URL } from "../utils/api";
 
 function Profile() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("datos");
 
-  
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [editingReview, setEditingReview] = useState(null);
@@ -20,9 +21,7 @@ function Profile() {
 
     const fetchMyReviews = async () => {
       try {
-        const res = await fetch(
-          `${API_URL}/api/reviews/user/${user.id}`,
-        );
+        const res = await fetch(`${API_URL}/api/reviews/user/${user.id}`);
         if (res.ok) {
           const data = await res.json();
           setReviews(data);

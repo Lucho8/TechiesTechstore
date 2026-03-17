@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../utils/api";
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);

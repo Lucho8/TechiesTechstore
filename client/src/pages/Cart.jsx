@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import PaymentModal from "../components/PaymentModal";
 import { useState } from "react";
 
+import { API_URL } from "../utils/config";
+
 const Cart = () => {
   const [showPayment, setShowPayment] = useState(false);
 

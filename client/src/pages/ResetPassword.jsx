@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
+import { API_URL } from "../utils/api";
+
 function ResetPassword() {
   const { token } = useParams();
   const navigate = useNavigate();

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+import { API_URL } from "../../utils/api";
+
 function AdminDashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState({
