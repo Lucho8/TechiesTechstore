@@ -1,16 +1,39 @@
-# React + Vite
+# 💻 Techies Store - Frontend (Client)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este es el lado del cliente (Frontend) de **Techies Store**, una aplicación de e-commerce construida para ofrecer una experiencia de usuario rápida, fluida y moderna. 
 
-Currently, two official plugins are available:
+Este proyecto fue inicializado con Vite para garantizar tiempos de carga y recarga ultrarrápidos durante el desarrollo.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tecnologías Principales
 
-## React Compiler
+* **React + Vite:** Motor principal de la interfaz y empaquetador.
+* **Tailwind CSS:** Framework de CSS utilizado para construir un diseño completamente responsivo y moderno (Dark Mode nativo).
+* **React Router DOM:** Para la navegación SPA (Single Page Application) y la implementación de rutas protegidas.
+* **Context API:** Herramienta nativa de React utilizada para el manejo del estado global (Sesión de Usuario y Carrito de Compras).
+* **React Hot Toast:** Implementado para brindar feedback visual elegante e instantáneo al usuario (éxitos, errores, advertencias).
+* **RC-Slider:** Librería utilizada para el componente visual del filtro de rango de precios.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Características Clave
 
-## Expanding the ESLint configuration
+* **Catálogo Dinámico y Paginado:** El frontend se comunica de manera eficiente con la API para filtrar productos por nombre, categoría y rango de precio, renderizando solo los resultados de la página actual.
+* **Gestión del Carrito:** Los usuarios pueden agregar productos, modificar cantidades y ver el total dinámico. El estado persiste para evitar que se pierda la compra al recargar.
+* **Autenticación Robusta:** Flujos completos de Login, Registro y Recuperación de Contraseñas, comunicándose de forma segura con el backend.
+* **Panel de Administrador (Rutas Protegidas):** El componente `<AdminRoute />` actúa como "Bouncer", verificando el rol del usuario en el estado global antes de permitir el acceso al Dashboard, donde se pueden gestionar productos, categorías y órdenes.
+* **Diseño Componentizado:** Arquitectura limpia separando Componentes de UI (Tarjetas, Navbars) de las Páginas principales (Vistas).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📂 Estructura del Proyecto
+
+```text
+client/
+├── public/           # Assets públicos (favicon, logos)
+├── src/
+│   ├── assets/       # Imágenes y SVGs utilizados en la UI
+│   ├── components/   # Componentes reutilizables (NavBar, ProductCard, PaymentModal)
+│   ├── context/      # Estados globales (AuthContext, CartContext)
+│   ├── pages/        # Vistas completas (Home, Login, Perfil y carpeta /admin)
+│   ├── App.jsx       # Configuración principal de React Router y Toaster
+│   ├── index.css     # Directivas principales de Tailwind CSS
+│   └── main.jsx      # Punto de entrada de la aplicación React
+├── index.html        # Plantilla HTML principal
+├── tailwind.config.js# Configuración y personalización de Tailwind
+└── package.json      # Dependencias y scripts del frontend
