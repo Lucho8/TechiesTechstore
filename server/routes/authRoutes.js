@@ -28,6 +28,7 @@ router.post("/register", async (req, res) => {
       .json({ message: "Usuario registrado exitosamente", user: newUser });
   } catch (error) {
     res.status(500).json({ error: "Error al registrar el usuario" });
+    console.error("🔥 ERROR CRÍTICO EN REGISTRO:", error);
   }
 });
 
@@ -46,6 +47,7 @@ router.post("/login", async (req, res) => {
     res.json({ message: "Inicio de sesión exitoso", user });
   } catch (error) {
     res.status(500).json({ error: "Error al iniciar sesión" });
+    console.error("🔥 ERROR CRÍTICO EN LOGIN:", error);
   }
 });
 
