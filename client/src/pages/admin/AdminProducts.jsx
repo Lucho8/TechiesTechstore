@@ -26,7 +26,7 @@ function AdminProducts() {
   const fetchProducts = async () => {
     const res = await fetch(`${API_URL}/api/products`);
     const data = await res.json();
-    setProducts(data);
+    setProducts(data.products);
   };
 
   const fetchCategories = async () => {

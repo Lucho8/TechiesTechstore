@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-
 import { API_URL } from "../../utils/api";
+import { useAuth } from "../../context/AuthContext";
 
 function AdminCategories() {
+  const { user } = useAuth();
+
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState("");
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,10 @@ function AdminCategories() {
     try {
       const res = await fetch(`${API_URL}/api/categories`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-role": user?.role,
+        },
         body: JSON.stringify({ name: newCategory }),
       });
 
@@ -57,6 +62,7 @@ function AdminCategories() {
     try {
       const res = await fetch(`${API_URL}/api/categories/${id}`, {
         method: "DELETE",
+        headers: { "x-user-role": user?.role },
       });
       const data = await res.json();
 
@@ -82,7 +88,10 @@ function AdminCategories() {
     try {
       const res = await fetch(`${API_URL}/api/categories/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-role": user?.role,
+        },
         body: JSON.stringify({ name: editName }),
       });
 
