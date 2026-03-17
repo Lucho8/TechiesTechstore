@@ -16,9 +16,7 @@ function MyOrders() {
 
   const fetchMyOrders = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/orders/user/${user.id}`,
-      );
+      const res = await fetch(`${API_URL}/api/orders/user/${user.id}`);
       const data = await res.json();
       setOrders(data);
     } catch (error) {

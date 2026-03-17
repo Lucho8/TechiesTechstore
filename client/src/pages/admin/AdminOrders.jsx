@@ -3,10 +3,8 @@ import { useState, useEffect } from "react";
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
 
-  
   const [pendingStatuses, setPendingStatuses] = useState({});
 
-  
   const [expandedOrder, setExpandedOrder] = useState(null);
 
   const [filterStatus, setFilterStatus] = useState("all");
@@ -17,7 +15,7 @@ function AdminOrders() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/orders");
+      const res = await fetch(`${API_URL}/api/orders`);
       const data = await res.json();
       setOrders(data);
     } catch (error) {
@@ -25,7 +23,6 @@ function AdminOrders() {
     }
   };
 
-  
   const handleSelectChange = (orderId, value) => {
     setPendingStatuses({
       ...pendingStatuses,
@@ -33,28 +30,23 @@ function AdminOrders() {
     });
   };
 
-  
   const handleStatusChange = async (orderId) => {
     const newStatus = pendingStatuses[orderId];
     if (!newStatus) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/orders/${orderId}/status`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus }),
-        },
-      );
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
       if (res.ok) {
-        
         const newPending = { ...pendingStatuses };
         delete newPending[orderId];
         setPendingStatuses(newPending);
 
-        fetchOrders(); 
+        fetchOrders();
       } else {
         alert("Hubo un error al cambiar el estado.");
       }
@@ -63,7 +55,6 @@ function AdminOrders() {
     }
   };
 
-  
   const toggleDetails = (orderId) => {
     if (expandedOrder === orderId) setExpandedOrder(null);
     else setExpandedOrder(orderId);
@@ -126,10 +117,9 @@ function AdminOrders() {
           </p>
         ) : (
           filteredOrders.map((order) => {
-            
             const currentSelectedStatus =
               pendingStatuses[order.id] || order.status;
-            
+
             const isChanged =
               pendingStatuses[order.id] &&
               pendingStatuses[order.id] !== order.status;
@@ -139,7 +129,6 @@ function AdminOrders() {
                 key={order.id}
                 className="bg-slate-900 rounded-lg border border-slate-700 overflow-hidden"
               >
-                
                 <div className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -159,7 +148,6 @@ function AdminOrders() {
                       📅 {new Date(order.createdAt).toLocaleDateString()}
                     </p>
 
-                    
                     <button
                       onClick={() => toggleDetails(order.id)}
                       className="mt-3 text-sm text-violet-400 hover:text-violet-300 underline underline-offset-4"
@@ -188,7 +176,6 @@ function AdminOrders() {
                         <option value="Entregado">Entregado</option>
                       </select>
 
-                      
                       {isChanged && (
                         <button
                           onClick={() => handleStatusChange(order.id)}
@@ -201,7 +188,6 @@ function AdminOrders() {
                   </div>
                 </div>
 
-                
                 {expandedOrder === order.id && (
                   <div className="bg-slate-950 p-6 border-t border-slate-800">
                     <h4 className="text-white font-bold mb-4">

@@ -3,12 +3,11 @@ import { useAuth } from "../../context/AuthContext";
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]); 
-  const [editingId, setEditingId] = useState(null); 
+  const [categories, setCategories] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   const { user } = useAuth();
 
-  
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -18,25 +17,23 @@ function AdminProducts() {
     categoryId: "",
   });
 
-  
   useEffect(() => {
     fetchProducts();
     fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
-    const res = await fetch("http://localhost:3000/api/products");
+    const res = await fetch(`${API_URL}/api/products`);
     const data = await res.json();
     setProducts(data);
   };
 
   const fetchCategories = async () => {
-    const res = await fetch("http://localhost:3000/api/categories");
+    const res = await fetch(`${API_URL}/api/categories`);
     const data = await res.json();
     setCategories(data);
   };
 
-  
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -47,19 +44,15 @@ function AdminProducts() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
     if (!formData.categoryId) {
       alert("¡Che, te olvidaste de elegir la categoría!");
       return;
     }
 
-    
-    
     const url = editingId
-      ? `http://localhost:3000/api/products/${editingId}` 
-      : "http://localhost:3000/api/products"; 
+      ? `${API_URL}/api/products/${editingId}`
+      : `${API_URL}/api/products`;
 
-    
     const method = editingId ? "PUT" : "POST";
 
     try {
@@ -73,7 +66,6 @@ function AdminProducts() {
       });
 
       if (res.ok) {
-        
         setFormData({
           name: "",
           price: "",
@@ -83,13 +75,10 @@ function AdminProducts() {
           categoryId: "",
         });
 
-        
         setEditingId(null);
 
-        
         fetchProducts();
 
-        
         alert(
           editingId
             ? "¡Cambios guardados correctamente! ✏️"
@@ -106,15 +95,14 @@ function AdminProducts() {
   };
 
   const handleDelete = async (id) => {
-    
     const isConfirmed = window.confirm(
       "¿Estás seguro de que querés borrar este producto? Esta acción no se puede deshacer.",
     );
 
-    if (!isConfirmed) return; 
+    if (!isConfirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/products/${id}`, {
+      const res = await fetch(`${API_URL}/api/products/${id}`, {
         method: "DELETE",
         headers: {
           "x-user-role": user?.role,
@@ -123,7 +111,7 @@ function AdminProducts() {
 
       if (res.ok) {
         alert("Producto eliminado.");
-        fetchProducts(); 
+        fetchProducts();
       } else {
         alert("Hubo un error al borrar.");
       }
@@ -133,7 +121,7 @@ function AdminProducts() {
   };
 
   const handleEditClick = (product) => {
-    setEditingId(product.id); 
+    setEditingId(product.id);
     setFormData({
       name: product.name,
       price: product.price,
@@ -150,7 +138,6 @@ function AdminProducts() {
         Gestionar Productos
       </h2>
 
-      
       <form
         onSubmit={handleSubmit}
         className="bg-slate-900 p-6 rounded-lg border border-slate-700 mb-10"
@@ -186,7 +173,6 @@ function AdminProducts() {
             className="bg-slate-800 text-white p-3 rounded-lg border border-slate-600 focus:border-violet-500 outline-none"
           />
 
-          
           <select
             name="categoryId"
             value={formData.categoryId}
@@ -231,7 +217,6 @@ function AdminProducts() {
         </button>
       </form>
 
-      
       <h3 className="text-xl font-bold text-white mb-4">
         Inventario Actual ({products.length})
       </h3>
@@ -254,13 +239,12 @@ function AdminProducts() {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex gap-2 items-center">
               <span className="text-xs bg-violet-900/50 text-violet-300 px-3 py-1 rounded-full border border-violet-700/50">
                 {prod.category?.name || "Sin Categoría"}
               </span>
 
-              
               <button
                 onClick={() => handleDelete(prod.id)}
                 className="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white p-2 rounded-lg transition-colors border border-red-500/50"

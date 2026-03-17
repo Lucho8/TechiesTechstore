@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 function ResetPassword() {
-  const { token } = useParams(); 
+  const { token } = useParams();
   const navigate = useNavigate();
 
   const [newPassword, setNewPassword] = useState("");
@@ -20,7 +20,7 @@ function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/api/auth/reset-password", {
+      const res = await fetch(`${API_URL}/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, newPassword }),
@@ -30,7 +30,7 @@ function ResetPassword() {
 
       if (res.ok) {
         toast.success(data.message + " 🚀");
-        navigate("/login"); 
+        navigate("/login");
       } else {
         toast.error(data.error || "El enlace expiró o es inválido");
       }

@@ -23,8 +23,8 @@ function Home() {
     const initData = async () => {
       try {
         const [catRes, priceRes] = await Promise.all([
-          fetch("http://localhost:3000/api/categories"),
-          fetch("http://localhost:3000/api/products/price-range"),
+          fetch(`${API_URL}/api/categories`),
+          fetch(`${API_URL}/api/products/price-range`),
         ]);
 
         const cats = await catRes.json();
@@ -82,7 +82,7 @@ function Home() {
       queryParams.append("limit", 6);
 
       const res = await fetch(
-        `http://localhost:3000/api/products?${queryParams.toString()}`,
+        `${API_URL}/api/products?${queryParams.toString()}`,
       );
       const data = await res.json();
 
@@ -224,7 +224,6 @@ function Home() {
         </form>
       </div>
 
-      
       <div className="w-full md:w-3/4 flex flex-col">
         {loading ? (
           <div className="text-center py-20 text-violet-400 text-xl animate-pulse font-bold">

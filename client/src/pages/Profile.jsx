@@ -21,7 +21,7 @@ function Profile() {
     const fetchMyReviews = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/reviews/user/${user.id}`,
+          `${API_URL}/api/reviews/user/${user.id}`,
         );
         if (res.ok) {
           const data = await res.json();
@@ -40,7 +40,7 @@ function Profile() {
   const handleDelete = async (id) => {
     if (!window.confirm("¿Seguro que querés borrar esta reseña?")) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/reviews/${id}`, {
+      const res = await fetch(`${API_URL}/api/reviews/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -60,7 +60,7 @@ function Profile() {
 
   const handleSaveEdit = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/reviews/${id}`, {
+      const res = await fetch(`${API_URL}/api/reviews/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating: editRating, comment: editComment }),

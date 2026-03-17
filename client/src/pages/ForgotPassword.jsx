@@ -14,7 +14,7 @@ function ForgotPassword() {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://localhost:3000/api/auth/forgot-password",
+        `${API_URL}/api/auth/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -6,7 +6,6 @@ function AdminCategories() {
   const [newCategory, setNewCategory] = useState("");
   const [loading, setLoading] = useState(true);
 
-  
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
 
@@ -16,7 +15,7 @@ function AdminCategories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/categories");
+      const res = await fetch(`${API_URL}/api/categories`);
       const data = await res.json();
       setCategories(data);
     } catch (error) {
@@ -31,7 +30,7 @@ function AdminCategories() {
     if (!newCategory.trim()) return;
 
     try {
-      const res = await fetch("http://localhost:3000/api/categories", {
+      const res = await fetch(`${API_URL}/api/categories`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newCategory }),
@@ -50,12 +49,11 @@ function AdminCategories() {
     }
   };
 
-  
   const handleDelete = async (id) => {
     if (!window.confirm("¿Seguro que querés borrar esta categoría?")) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/categories/${id}`, {
+      const res = await fetch(`${API_URL}/api/categories/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -64,7 +62,6 @@ function AdminCategories() {
         toast.success(data.message);
         setCategories(categories.filter((c) => c.id !== id));
       } else {
-        
         toast.error(data.error || "No se pudo borrar");
       }
     } catch (error) {
@@ -72,7 +69,6 @@ function AdminCategories() {
     }
   };
 
-  
   const startEditing = (category) => {
     setEditingId(category.id);
     setEditName(category.name);
@@ -82,7 +78,7 @@ function AdminCategories() {
     if (!editName.trim()) return toast.error("El nombre no puede estar vacío");
 
     try {
-      const res = await fetch(`http://localhost:3000/api/categories/${id}`, {
+      const res = await fetch(`${API_URL}/api/categories/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: editName }),
@@ -108,7 +104,6 @@ function AdminCategories() {
         Gestión de Categorías
       </h2>
 
-      
       <form onSubmit={handleAddCategory} className="flex gap-4 mb-8">
         <input
           type="text"
@@ -126,7 +121,6 @@ function AdminCategories() {
         </button>
       </form>
 
-      
       {loading ? (
         <p className="text-violet-400 animate-pulse font-bold text-center">
           Cargando...
@@ -142,7 +136,6 @@ function AdminCategories() {
               key={category.id}
               className="flex items-center justify-between bg-slate-900 p-4 rounded-lg border border-slate-700"
             >
-              
               {editingId === category.id ? (
                 <input
                   type="text"
@@ -157,7 +150,6 @@ function AdminCategories() {
                 </span>
               )}
 
-              
               <div className="flex gap-2">
                 {editingId === category.id ? (
                   <>
