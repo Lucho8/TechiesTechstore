@@ -99,7 +99,6 @@ router.get("/price-range", async (req, res) => {
   }
 });
 
-
 router.get("/related/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
@@ -161,7 +160,7 @@ router.get("/:slug", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", verifyAdmin, async (req, res) => {
   try {
     const { name, description, price, image, stock, categoryId } = req.body;
 
@@ -206,7 +205,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params; // Capturamos el ID de la URL
 
@@ -227,7 +226,7 @@ router.delete("/:id", async (req, res) => {
 // ---------------------------------------------------
 // EDITAR UN PRODUCTO (PUT /api/products/:id)
 // ---------------------------------------------------
-router.put("/:id", async (req, res) => {
+router.put("/:id", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, image, stock, categoryId } = req.body;
@@ -284,7 +283,5 @@ router.post("/:id/reviews", async (req, res) => {
     res.status(500).json({ error: "Error interno al guardar la reseña" });
   }
 });
-
-
 
 module.exports = router;
