@@ -6,7 +6,7 @@ function AdminCategories() {
   const [newCategory, setNewCategory] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // 👈 NUEVOS ESTADOS PARA LA EDICIÓN
+  
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
 
@@ -50,7 +50,7 @@ function AdminCategories() {
     }
   };
 
-  // 👈 FUNCIÓN PARA BORRAR (Con protección anti-explosiones)
+  
   const handleDelete = async (id) => {
     if (!window.confirm("¿Seguro que querés borrar esta categoría?")) return;
 
@@ -64,7 +64,7 @@ function AdminCategories() {
         toast.success(data.message);
         setCategories(categories.filter((c) => c.id !== id));
       } else {
-        // Acá mostramos el error si la categoría tiene productos adentro
+        
         toast.error(data.error || "No se pudo borrar");
       }
     } catch (error) {
@@ -72,7 +72,7 @@ function AdminCategories() {
     }
   };
 
-  // 👈 FUNCIONES PARA EDITAR
+  
   const startEditing = (category) => {
     setEditingId(category.id);
     setEditName(category.name);
@@ -108,7 +108,7 @@ function AdminCategories() {
         Gestión de Categorías
       </h2>
 
-      {/* Formulario para agregar nueva */}
+      
       <form onSubmit={handleAddCategory} className="flex gap-4 mb-8">
         <input
           type="text"
@@ -126,7 +126,7 @@ function AdminCategories() {
         </button>
       </form>
 
-      {/* Tabla/Lista de categorías */}
+      
       {loading ? (
         <p className="text-violet-400 animate-pulse font-bold text-center">
           Cargando...
@@ -142,7 +142,7 @@ function AdminCategories() {
               key={category.id}
               className="flex items-center justify-between bg-slate-900 p-4 rounded-lg border border-slate-700"
             >
-              {/* Modo Edición vs Modo Vista */}
+              
               {editingId === category.id ? (
                 <input
                   type="text"
@@ -157,7 +157,7 @@ function AdminCategories() {
                 </span>
               )}
 
-              {/* Botonera dinámica */}
+              
               <div className="flex gap-2">
                 {editingId === category.id ? (
                   <>

@@ -6,9 +6,6 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
-// ---------------------------------------------------
-// REGISTRO
-// ---------------------------------------------------
 router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -34,9 +31,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// ---------------------------------------------------
-// LOGIN
-// ---------------------------------------------------
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -55,9 +49,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ---------------------------------------------------
-// CONFIGURACIÓN DEL CARTERO
-// ---------------------------------------------------
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -66,9 +57,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ---------------------------------------------------
-// RECUPERACIÓN DE CLAVE (FORGOT)
-// ---------------------------------------------------
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
@@ -81,7 +69,7 @@ router.post("/forgot-password", async (req, res) => {
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora
+    const resetTokenExpiry = new Date(Date.now() + 3600000);
 
     await prisma.user.update({
       where: { email },
@@ -113,9 +101,6 @@ router.post("/forgot-password", async (req, res) => {
   }
 });
 
-// ---------------------------------------------------
-// APLICAR NUEVA CLAVE (RESET)
-// ---------------------------------------------------
 router.post("/reset-password", async (req, res) => {
   try {
     const { token, newPassword } = req.body;

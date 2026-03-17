@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext"; 
-import { useAuth } from "../context/AuthContext"; // 👈 1. TRAEMOS AL USUARIO
+import { useAuth } from "../context/AuthContext"; 
 import toast from "react-hot-toast"; 
 import ProductCard from "../components/ProductCard";
 
@@ -10,14 +10,14 @@ function ProductDetail() {
   const navigate = useNavigate();
 
   const { addToCart } = useCart(); 
-  const { user } = useAuth(); // 👈 2. SACAMOS AL USUARIO DEL CONTEXTO
+  const { user } = useAuth(); 
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [isAdded, setIsAdded] = useState(false); 
 
-  // 👈 3. ESTADOS PARA EL FORMULARIO DE RESEÑAS
+  
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,7 +35,7 @@ function ProductDetail() {
         const productData = await productRes.json();
         const relatedData = await relatedRes.json();
 
-        // Si el backend todavía no manda "reviews", le ponemos un array vacío por las dudas
+        
         setProduct({ ...productData, reviews: productData.reviews || [] });
         setRelatedProducts(relatedData);
       } catch (error) {
@@ -59,7 +59,7 @@ function ProductDetail() {
     }, 2000);
   };
 
-  // 👈 4. FUNCIÓN PARA ENVIAR LA RESEÑA AL BACKEND
+  
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!user) return toast.error("Tenés que iniciar sesión para comentar");
@@ -67,7 +67,7 @@ function ProductDetail() {
 
     setIsSubmitting(true);
     try {
-      // Usamos el ID del producto (no el slug) porque así lo armamos en el backend
+      
       const res = await fetch(`http://localhost:3000/api/products/${product.id}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -84,7 +84,7 @@ function ProductDetail() {
         setComment("");
         setRating(5);
         
-        // Magia Front-end: Agregamos la reseña nueva al estado al instante para no tener que recargar la página
+        
         const reviewConUsuario = { ...newReview, user: { name: user.name || "Usuario" } };
         setProduct({ ...product, reviews: [reviewConUsuario, ...product.reviews] });
       } else {
@@ -97,7 +97,7 @@ function ProductDetail() {
     }
   };
 
-  // 👈 5. CALCULAMOS EL PROMEDIO DE ESTRELLITAS
+  
   const averageRating = product?.reviews?.length > 0 
     ? (product.reviews.reduce((acc, rev) => acc + rev.rating, 0) / product.reviews.length).toFixed(1)
     : 0;
@@ -118,7 +118,7 @@ function ProductDetail() {
         <span>←</span> Volver al catálogo
       </Link>
 
-      {/* --- INFO PRINCIPAL DEL PRODUCTO --- */}
+      
       <div className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col md:flex-row mb-12">
         <div className="md:w-1/2 bg-slate-900 p-8 flex items-center justify-center relative">
           <div className="absolute top-4 left-4 bg-violet-900/50 text-violet-300 px-4 py-1 rounded-full border border-violet-700/50 text-sm font-bold backdrop-blur-sm">
@@ -130,7 +130,7 @@ function ProductDetail() {
         <div className="md:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-2 leading-tight">{product.name}</h1>
           
-          {/* Mostramos el promedio de estrellas abajo del título */}
+          
           <div className="flex items-center gap-2 mb-6 text-yellow-400">
             <span>⭐ {averageRating > 0 ? averageRating : "Nuevo"}</span>
             <span className="text-slate-400 text-sm">({product.reviews?.length || 0} reseñas)</span>
@@ -154,14 +154,14 @@ function ProductDetail() {
         </div>
       </div>
 
-      {/* 👈 6. SECCIÓN DE RESEÑAS Y COMENTARIOS */}
+      
       <div className="bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl p-8 sm:p-12 mb-12">
         <h2 className="text-2xl font-bold text-white mb-8 border-l-4 border-violet-500 pl-4">
           Reseñas de los clientes
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Lado Izquierdo: Formulario */}
+          
           <div>
             {user ? (
               <form onSubmit={handleReviewSubmit} className="bg-slate-900 p-6 rounded-2xl border border-slate-700">
@@ -212,7 +212,7 @@ function ProductDetail() {
             )}
           </div>
 
-          {/* Lado Derecho: Lista de Comentarios */}
+          
           <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {product.reviews?.length === 0 ? (
               <p className="text-slate-400 italic">Todavía no hay reseñas. ¡Sé el primero en opinar!</p>
@@ -231,7 +231,7 @@ function ProductDetail() {
         </div>
       </div>
 
-      {/* --- SECCIÓN DE PRODUCTOS RELACIONADOS --- */}
+      
       {relatedProducts.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold text-white mb-8 border-l-4 border-violet-500 pl-4">

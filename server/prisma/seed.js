@@ -1,19 +1,19 @@
-// server/prisma/seed.js
+
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Empezando el semillero...')
 
-  // 1. Limpiar la base de datos (por si corremos esto 2 veces)
-  // El orden importa por las relaciones (borrar hijos antes que padres)
+  
+  
   await prisma.orderItem.deleteMany()
   await prisma.order.deleteMany()
   await prisma.product.deleteMany()
   await prisma.category.deleteMany()
   await prisma.user.deleteMany()
 
-  // 2. Crear Categorías
+  
   const catPerifericos = await prisma.category.create({
     data: { name: 'Periféricos' }
   })
@@ -22,7 +22,7 @@ async function main() {
     data: { name: 'Hardware' }
   })
 
-  // 3. Crear Productos
+  
   await prisma.product.createMany({
     data: [
       {
@@ -55,12 +55,12 @@ async function main() {
     ]
   })
 
-  // 4. Crear Usuario Admin
-  // OJO: En la vida real la contraseña se encripta, acá va texto plano por ahora
+  
+  
   await prisma.user.create({
     data: {
       email: 'admin@techstore.com',
-      password: 'admin123', // Acordate de esta clave
+      password: 'admin123', 
       role: 'ADMIN',
       name: 'Super Admin'
     }

@@ -3,12 +3,12 @@ import { useAuth } from "../../context/AuthContext";
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]); // Guardamos las categorías para el Select
-  const [editingId, setEditingId] = useState(null); // Si es null, estamos creando. Si tiene un número, estamos editando.
+  const [categories, setCategories] = useState([]); 
+  const [editingId, setEditingId] = useState(null); 
 
   const { user } = useAuth();
 
-  // Estado para el formulario
+  
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -18,7 +18,7 @@ function AdminProducts() {
     categoryId: "",
   });
 
-  // Al cargar la página, traemos los productos y las categorías
+  
   useEffect(() => {
     fetchProducts();
     fetchCategories();
@@ -36,7 +36,7 @@ function AdminProducts() {
     setCategories(data);
   };
 
-  // Manejador para cuando escribís en cualquier input
+  
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -47,19 +47,19 @@ function AdminProducts() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validamos que haya elegido una categoría
+    
     if (!formData.categoryId) {
       alert("¡Che, te olvidaste de elegir la categoría!");
       return;
     }
 
-    // 🧠 LA MAGIA: ¿Estamos creando o editando?
-    // Si editingId tiene un número, usamos la URL con ese ID específico. Si es null, usamos la general.
+    
+    
     const url = editingId
-      ? `http://localhost:3000/api/products/${editingId}` // MODO EDICIÓN
-      : "http://localhost:3000/api/products"; // MODO CREACIÓN
+      ? `http://localhost:3000/api/products/${editingId}` 
+      : "http://localhost:3000/api/products"; 
 
-    // Si hay un ID, el método HTTP es PUT (actualizar). Si no, es POST (crear).
+    
     const method = editingId ? "PUT" : "POST";
 
     try {
@@ -73,7 +73,7 @@ function AdminProducts() {
       });
 
       if (res.ok) {
-        // 1. Limpiamos el formulario dejándolo en blanco
+        
         setFormData({
           name: "",
           price: "",
@@ -83,13 +83,13 @@ function AdminProducts() {
           categoryId: "",
         });
 
-        // 2. Apagamos el "Modo Edición" para que el próximo producto sea uno nuevo
+        
         setEditingId(null);
 
-        // 3. Recargamos la lista del inventario
+        
         fetchProducts();
 
-        // 4. Mostramos el mensaje correcto
+        
         alert(
           editingId
             ? "¡Cambios guardados correctamente! ✏️"
@@ -106,12 +106,12 @@ function AdminProducts() {
   };
 
   const handleDelete = async (id) => {
-    // 🛑 Confirmación de seguridad (UX clave)
+    
     const isConfirmed = window.confirm(
       "¿Estás seguro de que querés borrar este producto? Esta acción no se puede deshacer.",
     );
 
-    if (!isConfirmed) return; // Si dice que no, cancelamos
+    if (!isConfirmed) return; 
 
     try {
       const res = await fetch(`http://localhost:3000/api/products/${id}`, {
@@ -123,7 +123,7 @@ function AdminProducts() {
 
       if (res.ok) {
         alert("Producto eliminado.");
-        fetchProducts(); // Recargamos la lista para que desaparezca visualmente
+        fetchProducts(); 
       } else {
         alert("Hubo un error al borrar.");
       }
@@ -133,7 +133,7 @@ function AdminProducts() {
   };
 
   const handleEditClick = (product) => {
-    setEditingId(product.id); // Le avisamos al sistema que entramos en modo edición
+    setEditingId(product.id); 
     setFormData({
       name: product.name,
       price: product.price,
@@ -150,7 +150,7 @@ function AdminProducts() {
         Gestionar Productos
       </h2>
 
-      {/* 📝 FORMULARIO DE CARGA */}
+      
       <form
         onSubmit={handleSubmit}
         className="bg-slate-900 p-6 rounded-lg border border-slate-700 mb-10"
@@ -186,7 +186,7 @@ function AdminProducts() {
             className="bg-slate-800 text-white p-3 rounded-lg border border-slate-600 focus:border-violet-500 outline-none"
           />
 
-          {/* EL SELECT MÁGICO DE CATEGORÍAS */}
+          
           <select
             name="categoryId"
             value={formData.categoryId}
@@ -231,7 +231,7 @@ function AdminProducts() {
         </button>
       </form>
 
-      {/* 📦 LISTA DE PRODUCTOS CARGADOS */}
+      
       <h3 className="text-xl font-bold text-white mb-4">
         Inventario Actual ({products.length})
       </h3>
@@ -254,13 +254,13 @@ function AdminProducts() {
                 </p>
               </div>
             </div>
-            {/* ... adentro del map de products ... */}
+            
             <div className="flex gap-2 items-center">
               <span className="text-xs bg-violet-900/50 text-violet-300 px-3 py-1 rounded-full border border-violet-700/50">
                 {prod.category?.name || "Sin Categoría"}
               </span>
 
-              {/* 🔥 EL BOTÓN ROJO 🔥 */}
+              
               <button
                 onClick={() => handleDelete(prod.id)}
                 className="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white p-2 rounded-lg transition-colors border border-red-500/50"

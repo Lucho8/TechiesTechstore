@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 function ResetPassword() {
-  const { token } = useParams(); // Atrapamos el token de la URL
+  const { token } = useParams(); 
   const navigate = useNavigate();
 
   const [newPassword, setNewPassword] = useState("");
@@ -30,7 +30,7 @@ function ResetPassword() {
 
       if (res.ok) {
         toast.success(data.message + " 🚀");
-        navigate("/login"); // Lo mandamos directo a iniciar sesión
+        navigate("/login"); 
       } else {
         toast.error(data.error || "El enlace expiró o es inválido");
       }

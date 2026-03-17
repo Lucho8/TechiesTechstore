@@ -6,7 +6,7 @@ function ProductCard({ product }) {
 
   return (
     <div className="bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-violet-500/20 transition-all duration-300 border border-slate-700 flex flex-col h-full">
-      {/* IMAGEN (Con un contenedor para que siempre tenga el mismo tamaño) */}
+      
 
       <Link to={`/product/${product.slug}`}>
         <div className="h-48 overflow-hidden relative group">
@@ -17,9 +17,9 @@ function ProductCard({ product }) {
           />
         </div>
       </Link>
-      {/* CONTENIDO */}
+      
       <div className="p-5 flex flex-col grow">
-        {/* Categoría pequeñita */}
+        
         <span className="text-violet-400 text-xs font-bold uppercase tracking-wider mb-2">
           {product.category.name}
         </span>
@@ -36,24 +36,24 @@ function ProductCard({ product }) {
           )}
         </div>
 
-        {/* Título */}
+        
         <h3 className="text-xl font-bold text-white mb-2 leading-tight">
           {product.name}
         </h3>
 
-        {/* Precio (A la derecha y grande) */}
+        
         <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-700">
           <span className="text-2xl font-bold text-white">
             ${Number(product.price).toLocaleString()}
           </span>
 
-          {/* Botón de Acción */}
+          
           {product.stock > 0 ? (
             <button
               className="bg-violet-600 hover:bg-violet-500 text-white p-2 rounded-lg transition-colors shadow-lg shadow-violet-600/20"
               onClick={() => addToCart(product)}
             >
-              {/* Ícono de carrito (SVG simple) */}
+              
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

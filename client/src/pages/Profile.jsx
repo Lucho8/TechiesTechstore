@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import MyOrders from "./MyOrders";
-import { Link } from "react-router-dom"; // 👈 Para los links a los productos
-import toast from "react-hot-toast"; // 👈 Para las notificaciones
+import { Link } from "react-router-dom"; 
+import toast from "react-hot-toast"; 
 
 function Profile() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("datos");
 
-  // --- ESTADOS Y LÓGICA PARA LAS RESEÑAS ---
+  
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [editingReview, setEditingReview] = useState(null);
@@ -85,7 +85,7 @@ function Profile() {
 
   return (
     <div className="max-w-6xl mx-auto p-4 flex flex-col md:flex-row gap-6">
-      {/* 📱 MENÚ LATERAL (Sidebar) */}
+      {}
       <div className="w-full md:w-1/4 bg-slate-800 p-6 rounded-xl border border-slate-700 h-fit shadow-xl">
         <div className="text-center mb-6">
           <div className="w-24 h-24 bg-violet-600 rounded-full mx-auto mb-3 flex items-center justify-center text-4xl shadow-lg shadow-violet-500/30">
@@ -110,7 +110,7 @@ function Profile() {
           >
             📦 Mis Compras
           </button>
-          {/* 👈 NUEVA PESTAÑA: MIS RESEÑAS */}
+          {}
           <button
             onClick={() => setActiveTab("reseñas")}
             className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === "reseñas" ? "bg-amber-600 text-white" : "text-slate-400 hover:bg-slate-700 hover:text-white"}`}
@@ -129,9 +129,9 @@ function Profile() {
         </div>
       </div>
 
-      {/* 🖥️ ÁREA PRINCIPAL */}
+      {}
       <div className="w-full md:w-3/4">
-        {/* PESTAÑA 1: MIS DATOS */}
+        {}
         {activeTab === "datos" && (
           <div className="bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-xl">
             <h3 className="text-2xl font-bold text-white mb-6 border-b border-slate-700 pb-4">
@@ -161,14 +161,14 @@ function Profile() {
           </div>
         )}
 
-        {/* PESTAÑA 2: MIS COMPRAS */}
+        {}
         {activeTab === "compras" && (
           <div className="bg-slate-800 rounded-xl border border-slate-700 shadow-xl overflow-hidden">
             <MyOrders />
           </div>
         )}
 
-        {/* 👈 PESTAÑA 3: MIS RESEÑAS */}
+        {}
         {activeTab === "reseñas" && (
           <div className="bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-xl">
             <h3 className="text-2xl font-bold text-white mb-6 border-b border-slate-700 pb-4">
@@ -198,7 +198,7 @@ function Profile() {
                     key={review.id}
                     className="bg-slate-900 p-6 rounded-2xl border border-slate-700 flex flex-col sm:flex-row gap-6"
                   >
-                    {/* Foto e info del producto */}
+                    {}
                     <div className="sm:w-1/3 border-b sm:border-b-0 sm:border-r border-slate-700 pb-4 sm:pb-0 sm:pr-6">
                       <img
                         src={
@@ -216,7 +216,7 @@ function Profile() {
                       </Link>
                     </div>
 
-                    {/* Reseña y Edición */}
+                    {}
                     <div className="sm:w-2/3 flex flex-col">
                       <div className="text-yellow-400 text-lg mb-2">
                         {editingReview === review.id ? (
@@ -252,7 +252,7 @@ function Profile() {
                         )}
                       </div>
 
-                      {/* Botones de acción alineados a la derecha */}
+                      {}
                       <div className="flex justify-end gap-3 mt-auto">
                         {editingReview === review.id ? (
                           <>

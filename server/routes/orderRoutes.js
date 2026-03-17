@@ -13,24 +13,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// POST /api/orders - Finalizar compra
+
 router.post("/", async (req, res) => {
   const { userId, cartItems, total } = req.body;
 
   try {
-    // 🛡️ USAMOS $TRANSACTION: O se hace todo, o no se hace nada.
+    
     const result = await prisma.$transaction(async (tx) => {
-      // 1. CREAR LA ORDEN Y SUS DETALLES (Relación anidada)
+      
       const newOrder = await tx.order.create({
         data: {
           userId: userId,
           total: total,
-          // Creamos los items de la orden automáticamente en la tabla vinculada
+          
           items: {
             create: cartItems.map((item) => ({
               productId: item.id,
               quantity: item.quantity,
-              price: item.price, // Guardamos el precio del momento de compra
+              price: item.price, 
             })),
           },
         },
@@ -41,10 +41,10 @@ router.post("/", async (req, res) => {
       });
 
       if (userDb) {
-        // 2. Armamos el diseño del correo (podés ponerle HTML para que quede lindo)
+        
         const mailOptions = {
           from: `"Techies Store" <${process.env.EMAIL_USER}>`,
-          to: userDb.email, // Se lo mandamos al correo con el que se registró
+          to: userDb.email, 
           subject: "¡Confirmación de tu compra en Techies! 🚀",
           html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
@@ -75,19 +75,19 @@ router.post("/", async (req, res) => {
         });
       }
 
-      // 2. ACTUALIZAR EL STOCK DE CADA PRODUCTO
-      // Usamos un bucle for...of para asegurar que Prisma espere cada actualización
+      
+      
       for (const item of cartItems) {
         const updatedProduct = await tx.product.update({
           where: { id: item.id },
           data: {
             stock: {
-              decrement: item.quantity, // Restamos la cantidad comprada
+              decrement: item.quantity, 
             },
           },
         });
 
-        // Verificación de seguridad extra por si el stock quedó negativo
+        
         if (updatedProduct.stock < 0) {
           throw new Error(
             `¡No hay stock suficiente para ${updatedProduct.name}!`,
@@ -98,7 +98,7 @@ router.post("/", async (req, res) => {
       return newOrder;
     });
 
-    // Si llegamos acá, la transacción fue exitosa
+    
     res.status(201).json({
       message: "¡Orden procesada con éxito!",
       order: result,
@@ -116,14 +116,14 @@ router.get("/", async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
       orderBy: {
-        createdAt: "desc", // Las compras más nuevas aparecen primero arriba
+        createdAt: "desc", 
       },
       include: {
         user: {
-          select: { name: true, email: true }, // Traemos quién lo compró
+          select: { name: true, email: true }, 
         },
         items: {
-          include: { product: true }, // Traemos qué productos son
+          include: { product: true }, 
         },
       },
     });
@@ -137,13 +137,13 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ---------------------------------------------------
-// ACTUALIZAR EL ESTADO DE UNA ORDEN (PUT /api/orders/:id/status)
-// ---------------------------------------------------
+
+
+
 router.put("/:id/status", async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body; // Acá va a llegar "Enviado", "Completado", etc.
+    const { status } = req.body; 
 
     const updatedOrder = await prisma.order.update({
       where: { id: parseInt(id) },
@@ -168,14 +168,14 @@ router.get("/user/:userId", async (req, res) => {
 
     const myOrders = await prisma.order.findMany({
       where: {
-        userId: parseInt(userId), // Filtramos solo por este cliente
+        userId: parseInt(userId), 
       },
       orderBy: {
-        createdAt: "desc", // Las más nuevas arriba
+        createdAt: "desc", 
       },
       include: {
         items: {
-          include: { product: true }, // Traemos los productos para mostrar la fotito
+          include: { product: true }, 
         },
       },
     });

@@ -9,7 +9,6 @@ function MyOrders() {
   const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
-    // Si hay un usuario logueado, vamos a buscar sus compras
     if (user) {
       fetchMyOrders();
     }
@@ -29,7 +28,6 @@ function MyOrders() {
     }
   };
 
-  // Colores amigables para el cliente
   const getStatusBadge = (status) => {
     switch (status) {
       case "pending":
@@ -67,10 +65,8 @@ function MyOrders() {
     );
 
   const filteredOrders = orders.filter((order) => {
-    // 1. ¿Coincide con el número de orden?
     const matchId = order.id.toString().includes(searchTerm);
 
-    // 2. ¿Coincide con algún nombre de producto adentro de la caja?
     const matchProduct = order.items?.some((item) =>
       item.product?.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
@@ -113,7 +109,6 @@ function MyOrders() {
               key={order.id}
               className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg"
             >
-              {/* 📌 CABECERA DE LA ORDEN */}
               <div className="bg-slate-900 p-6 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                   <p className="text-slate-400 text-sm">Fecha de compra</p>
@@ -121,7 +116,6 @@ function MyOrders() {
                     {new Date(order.createdAt).toLocaleDateString()}
                   </p>
 
-                  {/* BOTÓN PARA ABRIR/CERRAR EL ACORDEÓN */}
                   <button
                     onClick={() => toggleDetails(order.id)}
                     className="mt-2 text-sm text-emerald-400 hover:text-emerald-300 underline underline-offset-4"
@@ -142,7 +136,6 @@ function MyOrders() {
                 <div>{getStatusBadge(order.status)}</div>
               </div>
 
-              {/* 📦 DETALLES DE LA ORDEN (Solo se ven si tocás el botón) */}
               {expandedOrder === order.id && (
                 <div className="p-6 space-y-4 bg-slate-800/50">
                   <h4 className="text-white font-bold mb-4 border-b border-slate-700 pb-2">

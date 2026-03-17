@@ -13,7 +13,7 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
-// Rutas
+
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);

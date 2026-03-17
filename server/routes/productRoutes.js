@@ -8,15 +8,15 @@ const slugify = (text) => {
   return text
     .toString()
     .toLowerCase()
-    .replace(/\s+/g, "-") // Reemplaza espacios con guiones
-    .replace(/[^\w\-]+/g, "") // Borra caracteres raros
-    .replace(/\-\-+/g, "-") // Borra guiones duplicados
-    .replace(/^-+/, "") // Corta guiones al principio
-    .replace(/-+$/, ""); // Corta guiones al final
+    .replace(/\s+/g, "-") 
+    .replace(/[^\w\-]+/g, "") 
+    .replace(/\-\-+/g, "-") 
+    .replace(/^-+/, "") 
+    .replace(/-+$/, ""); 
 };
 
-// RUTA 1: Obtener todos los productos
-// GET /api/products
+
+
 router.get("/", async (req, res) => {
   try {
     const {
@@ -47,27 +47,27 @@ router.get("/", async (req, res) => {
       if (maxPrice) whereClause.price.lte = Number(maxPrice);
     }
 
-    // --- MAGIA DE LA PAGINACIÓN ---
+    
     const currentPage = Number(page);
     const productsPerPage = Number(limit);
     const skip = (currentPage - 1) * productsPerPage;
 
-    // Hacemos DOS consultas al mismo tiempo
+    
     const [products, totalProducts] = await Promise.all([
       prisma.product.findMany({
         where: whereClause,
         include: { category: true },
         orderBy: { createdAt: "desc" },
         skip: skip,
-        take: productsPerPage, // Solo traemos los que pide el limit
+        take: productsPerPage, 
       }),
       prisma.product.count({ where: whereClause }),
     ]);
 
-    // Calculamos el total de páginas
+    
     const totalPages = Math.ceil(totalProducts / productsPerPage);
 
-    // DEVOLVEMOS EL OBJETO ESTRUCTURADO QUE EL FRONTEND ESPERA
+    
     res.json({
       products: products,
       totalPages: totalPages,
@@ -91,7 +91,7 @@ router.get("/price-range", async (req, res) => {
 
     res.json({
       min: Number(stats._min.price) || 0,
-      max: Number(stats._max.price) || 100000, // Por si la base está vacía
+      max: Number(stats._max.price) || 100000, 
     });
   } catch (error) {
     console.error("Error buscando rango de precios:", error);
@@ -103,22 +103,22 @@ router.get("/related/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
 
-    // 1. Buscamos el producto actual para saber de qué categoría es
+    
     const currentProduct = await prisma.product.findUnique({
       where: { slug: slug },
     });
 
     if (!currentProduct) {
-      return res.json([]); // Si no existe, devolvemos un array vacío
+      return res.json([]); 
     }
 
-    // 2. Buscamos otros de la misma categoría, excluyendo el actual
+    
     const relatedProducts = await prisma.product.findMany({
       where: {
         categoryId: currentProduct.categoryId,
-        slug: { not: slug }, // Magia de Prisma: "Que el slug NO sea el actual"
+        slug: { not: slug }, 
       },
-      take: 4, // Solo queremos 4 sugerencias como máximo
+      take: 4, 
       include: { category: true },
     });
 
@@ -129,8 +129,8 @@ router.get("/related/:slug", async (req, res) => {
   }
 });
 
-// RUTA 2: Obtener un solo producto por su SLUG (para el detalle)
-// GET /api/products/teclado-mecanico-rgb
+
+
 router.get("/:slug", async (req, res) => {
   const { slug } = req.params;
   try {
@@ -138,14 +138,14 @@ router.get("/:slug", async (req, res) => {
       where: { slug: slug },
       include: {
         category: true,
-        // 👇 AGREGAMOS ESTO PARA TRAER LAS RESEÑAS
+        
         reviews: {
           include: {
             user: {
-              select: { name: true }, // Solo traemos el nombre, nada de contraseñas
+              select: { name: true }, 
             },
           },
-          orderBy: { createdAt: "desc" }, // Las más nuevas arriba
+          orderBy: { createdAt: "desc" }, 
         },
       },
     });
@@ -164,24 +164,24 @@ router.post("/", verifyAdmin, async (req, res) => {
   try {
     const { name, description, price, image, stock, categoryId } = req.body;
 
-    // 1. EL PATOVICA DE LOS DATOS (Validación temprana)
+    
     if (!name || !price || !categoryId) {
       return res.status(400).json({
         error: "Faltan datos obligatorios jefe, revise el formulario.",
       });
     }
 
-    // 2. CREAMOS EL SLUG AUTOMÁTICAMENTE
+    
     const generatedSlug = slugify(name);
 
-    // 3. GUARDAMOS EN LA BASE DE DATOS
+    
     const newProduct = await prisma.product.create({
       data: {
         name: name.trim(),
-        slug: generatedSlug, // Se guarda solito
-        description: description || "Sin descripción", // Valor por defecto si viene vacío
+        slug: generatedSlug, 
+        description: description || "Sin descripción", 
         price: parseFloat(price),
-        image: image || "https://via.placeholder.com/300", // Imagen por defecto por si se olvidan
+        image: image || "https://via.placeholder.com/300", 
         stock: parseInt(stock) || 0,
         categoryId: parseInt(categoryId),
       },
@@ -194,7 +194,7 @@ router.post("/", verifyAdmin, async (req, res) => {
   } catch (error) {
     console.error("Error al crear producto:", error);
 
-    // Si el nombre o slug ya existen (error P2002 de Prisma)
+    
     if (error.code === "P2002") {
       return res
         .status(400)
@@ -207,9 +207,9 @@ router.post("/", verifyAdmin, async (req, res) => {
 
 router.delete("/:id", verifyAdmin, async (req, res) => {
   try {
-    const { id } = req.params; // Capturamos el ID de la URL
+    const { id } = req.params; 
 
-    // Prisma hace el trabajo sucio
+    
     await prisma.product.delete({
       where: {
         id: parseInt(id),
@@ -223,15 +223,15 @@ router.delete("/:id", verifyAdmin, async (req, res) => {
   }
 });
 
-// ---------------------------------------------------
-// EDITAR UN PRODUCTO (PUT /api/products/:id)
-// ---------------------------------------------------
+
+
+
 router.put("/:id", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, image, stock, categoryId } = req.body;
 
-    // Actualizamos usando Prisma
+    
     const updatedProduct = await prisma.product.update({
       where: { id: parseInt(id) },
       data: {
@@ -251,23 +251,23 @@ router.put("/:id", verifyAdmin, async (req, res) => {
   }
 });
 
-// ---------------------------------------------------
-// OBTENER PRODUCTOS RELACIONADOS (GET /api/products/related/:slug)
-// ---------------------------------------------------
+
+
+
 
 router.post("/:id/reviews", async (req, res) => {
   try {
     const { id } = req.params;
     const { rating, comment, userId } = req.body;
 
-    // Validamos que no nos manden información vacía
+    
     if (!rating || !comment || !userId) {
       return res
         .status(400)
         .json({ error: "Faltan datos para crear la reseña" });
     }
 
-    // Le decimos a Prisma que guarde la reseña
+    
     const newReview = await prisma.review.create({
       data: {
         rating: Number(rating),

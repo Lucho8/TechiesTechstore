@@ -20,14 +20,13 @@ import AdminOrders from "./pages/admin/AdminOrders.jsx";
 function App() {
   return (
     <BrowserRouter>
-      {/* 👈 2. AGREGAMOS EL TOASTER ACÁ ARRIBA, FLOTANDO EN TODA LA APP */}
       <Toaster
         position="bottom-right"
         toastOptions={{
           style: {
-            background: "#1e293b", // Color slate-800
+            background: "#1e293b",
             color: "#fff",
-            border: "1px solid #334155", // Color slate-700
+            border: "1px solid #334155",
           },
           success: { iconTheme: { primary: "#10b981", secondary: "#fff" } },
           error: { iconTheme: { primary: "#ef4444", secondary: "#fff" } },
@@ -52,7 +51,6 @@ function App() {
             <Route path="/admin/categories" element={<AdminCategories />} />
             <Route path="/admin/products" element={<AdminProducts />} />
             <Route path="/admin/orders" element={<AdminOrders />} />
-            {/* Acá meteremos el CRUD de productos después */}
           </Route>
         </Routes>
       </div>

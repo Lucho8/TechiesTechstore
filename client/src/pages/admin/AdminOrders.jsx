@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
 
-  // 1. ESTADO PARA PREVENIR ERRORES: Guarda el cambio de estado antes de confirmar
+  
   const [pendingStatuses, setPendingStatuses] = useState({});
 
-  // 2. ESTADO PARA LOS DETALLES: Guarda el ID de la orden que estamos mirando
+  
   const [expandedOrder, setExpandedOrder] = useState(null);
 
   const [filterStatus, setFilterStatus] = useState("all");
@@ -25,7 +25,7 @@ function AdminOrders() {
     }
   };
 
-  // Maneja cuando elegís algo en el Select, pero NO guarda en DB
+  
   const handleSelectChange = (orderId, value) => {
     setPendingStatuses({
       ...pendingStatuses,
@@ -33,7 +33,7 @@ function AdminOrders() {
     });
   };
 
-  // Maneja cuando apretás el botón de CONFIRMAR
+  
   const handleStatusChange = async (orderId) => {
     const newStatus = pendingStatuses[orderId];
     if (!newStatus) return;
@@ -49,12 +49,12 @@ function AdminOrders() {
       );
 
       if (res.ok) {
-        // Limpiamos el estado temporal porque ya es oficial
+        
         const newPending = { ...pendingStatuses };
         delete newPending[orderId];
         setPendingStatuses(newPending);
 
-        fetchOrders(); // Recargamos para ver el cambio
+        fetchOrders(); 
       } else {
         alert("Hubo un error al cambiar el estado.");
       }
@@ -63,7 +63,7 @@ function AdminOrders() {
     }
   };
 
-  // Abre y cierra el acordeón de detalles
+  
   const toggleDetails = (orderId) => {
     if (expandedOrder === orderId) setExpandedOrder(null);
     else setExpandedOrder(orderId);
@@ -126,10 +126,10 @@ function AdminOrders() {
           </p>
         ) : (
           filteredOrders.map((order) => {
-            // Vemos si hay un estado pendiente de confirmación para esta orden en particular
+            
             const currentSelectedStatus =
               pendingStatuses[order.id] || order.status;
-            // Vemos si el estado seleccionado es distinto al real de la DB
+            
             const isChanged =
               pendingStatuses[order.id] &&
               pendingStatuses[order.id] !== order.status;
@@ -139,7 +139,7 @@ function AdminOrders() {
                 key={order.id}
                 className="bg-slate-900 rounded-lg border border-slate-700 overflow-hidden"
               >
-                {/* 📌 CABECERA DE LA ORDEN (Siempre visible) */}
+                
                 <div className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -159,7 +159,7 @@ function AdminOrders() {
                       📅 {new Date(order.createdAt).toLocaleDateString()}
                     </p>
 
-                    {/* Botón para ver detalles */}
+                    
                     <button
                       onClick={() => toggleDetails(order.id)}
                       className="mt-3 text-sm text-violet-400 hover:text-violet-300 underline underline-offset-4"
@@ -188,7 +188,7 @@ function AdminOrders() {
                         <option value="Entregado">Entregado</option>
                       </select>
 
-                      {/* 🛡️ BOTÓN DE CONFIRMACIÓN (Solo aparece si cambiaste el select) */}
+                      
                       {isChanged && (
                         <button
                           onClick={() => handleStatusChange(order.id)}
@@ -201,7 +201,7 @@ function AdminOrders() {
                   </div>
                 </div>
 
-                {/* 🔍 DETALLES DE LA ORDEN (Se abre tipo acordeón) */}
+                
                 {expandedOrder === order.id && (
                   <div className="bg-slate-950 p-6 border-t border-slate-800">
                     <h4 className="text-white font-bold mb-4">

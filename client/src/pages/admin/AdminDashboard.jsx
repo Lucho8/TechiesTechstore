@@ -18,7 +18,7 @@ function AdminDashboard() {
       try {
         const res = await fetch("http://localhost:3000/api/stats", {
           headers: {
-            "x-user-role": user?.role, // Le mostramos el DNI al patovica
+            "x-user-role": user?.role, 
           },
         });
         if (res.ok) {
@@ -43,14 +43,14 @@ function AdminDashboard() {
         Panel de Control
       </h2>
 
-      {/* 📈 SECCIÓN DE ESTADÍSTICAS */}
+      
       {loading ? (
         <div className="text-violet-400 text-xl animate-pulse mb-10">
           Calculando finanzas... ⏳
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {/* Tarjeta: Ingresos */}
+          
           <div className="bg-linear-to-br from-slate-800 to-slate-900 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-slate-400 font-medium">Ingresos Totales</h3>
@@ -61,7 +61,7 @@ function AdminDashboard() {
             </p>
           </div>
 
-          {/* Tarjeta: Órdenes Pendientes */}
+          
           <div className="bg-linear-to-br from-slate-800 to-slate-900 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-slate-400 font-medium">Órdenes Pendientes</h3>
@@ -77,7 +77,7 @@ function AdminDashboard() {
             </div>
           </div>
 
-          {/* Tarjeta: Productos */}
+          
           <div className="bg-linear-to-br from-slate-800 to-slate-900 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-slate-400 font-medium">Productos Activos</h3>
@@ -88,7 +88,7 @@ function AdminDashboard() {
             </p>
           </div>
 
-          {/* Tarjeta: Usuarios */}
+          
           <div className="bg-linear-to-br from-slate-800 to-slate-900 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-slate-400 font-medium">
@@ -101,7 +101,7 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* 🛠️ ACCESOS DIRECTOS */}
+      
       <h3 className="text-2xl font-bold text-white mb-6">Accesos Rápidos</h3>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <Link

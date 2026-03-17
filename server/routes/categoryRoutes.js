@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { verifyAdmin } = require("../middleware/auth"); // 👈 IMPORTAMOS EL PATOVICA
+const { verifyAdmin } = require("../middleware/auth"); 
 
-// OBTENER TODAS LAS CATEGORÍAS (Público)
+
 router.get("/", async (req, res) => {
   try {
     const categories = await prisma.category.findMany({
@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// CREAR NUEVA CATEGORÍA (Solo Admin)
+
 router.post("/", verifyAdmin, async (req, res) => {
   try {
     const { name } = req.body;
@@ -33,7 +33,7 @@ router.post("/", verifyAdmin, async (req, res) => {
   }
 });
 
-// EDITAR CATEGORÍA (Solo Admin)
+
 router.put("/:id", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -55,7 +55,7 @@ router.put("/:id", verifyAdmin, async (req, res) => {
   }
 });
 
-// BORRAR CATEGORÍA (Solo Admin)
+
 router.delete("/:id", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;

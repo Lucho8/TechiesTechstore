@@ -51,11 +51,11 @@ export function CartProvider({ children }) {
   const decreaseQuantity = (id) => {
     setCart((prevCart) =>
       prevCart.map((item) => {
-        // Si encontramos el producto y su cantidad es mayor a 1, le restamos 1
+        
         if (item.id === id && item.quantity > 1) {
           return { ...item, quantity: item.quantity - 1 };
         }
-        return item; // Si tiene 1, no bajamos a 0 (para eso está el botón Eliminar)
+        return item; 
       }),
     );
   };

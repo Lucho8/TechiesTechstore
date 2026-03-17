@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
-    setLoading(false); // <-- Terminamos de cargar
+    setLoading(false);
   }, []);
 
   return (

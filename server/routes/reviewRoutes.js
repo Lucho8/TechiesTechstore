@@ -3,12 +3,12 @@ const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// 1. OBTENER LAS RESEÑAS DE UN USUARIO
+
 router.get('/user/:userId', async (req, res) => {
   try {
     const reviews = await prisma.review.findMany({
       where: { userId: Number(req.params.userId) },
-      include: { product: true }, // Traemos el producto para mostrar foto y nombre
+      include: { product: true }, 
       orderBy: { createdAt: 'desc' }
     });
     res.json(reviews);
@@ -18,7 +18,7 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
-// 2. EDITAR UNA RESEÑA
+
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -35,7 +35,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// 3. BORRAR UNA RESEÑA
+
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;

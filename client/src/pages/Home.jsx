@@ -17,13 +17,11 @@ function Home() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // 👈 NUEVO ESTADO: Controla la "carrera" de datos
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const initData = async () => {
       try {
-        // Traemos categorías y precios al mismo tiempo, y ESPERAMOS a que ambos terminen
         const [catRes, priceRes] = await Promise.all([
           fetch("http://localhost:3000/api/categories"),
           fetch("http://localhost:3000/api/products/price-range"),
@@ -34,7 +32,6 @@ function Home() {
 
         setCategories(cats);
 
-        // 👈 PROTECCIÓN EXTRA: Si la DB está vacía o falla, forzamos números válidos
         const min = prices.min != null ? Number(prices.min) : 0;
         const max =
           prices.max != null && prices.max > 0 ? Number(prices.max) : 100000;
@@ -42,7 +39,6 @@ function Home() {
         setGlobalMinMax([min, max]);
         setPriceRange([min, max]);
 
-        // Ya tenemos el rango de precio real, damos luz verde
         setIsReady(true);
       } catch (error) {
         console.error("Error inicializando:", error);
@@ -100,12 +96,10 @@ function Home() {
     }
   };
 
-  // 👈 MAGIA: Solo buscamos productos si 'isReady' es verdadero
   useEffect(() => {
     if (isReady) {
       fetchProducts(null, null, page);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, isReady]);
 
   const handleFilterSubmit = (e) => {
@@ -133,7 +127,6 @@ function Home() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 flex flex-col md:flex-row gap-8 mb-20">
-      {/* 🎛️ PANEL DE FILTROS */}
       <div className="w-full md:w-1/4 bg-slate-800 p-6 rounded-2xl border border-slate-700 h-fit sticky top-24 shadow-2xl">
         <h2 className="text-xl font-bold text-white mb-6 border-b border-slate-700 pb-2">
           Filtros de Búsqueda
@@ -231,7 +224,7 @@ function Home() {
         </form>
       </div>
 
-      {/* 🛍️ CATÁLOGO DE PRODUCTOS */}
+      
       <div className="w-full md:w-3/4 flex flex-col">
         {loading ? (
           <div className="text-center py-20 text-violet-400 text-xl animate-pulse font-bold">
@@ -255,7 +248,6 @@ function Home() {
           </div>
         ) : (
           <>
-            {/* 👇 ACA AGREGAMOS EL 'content-start' PARA QUE NO SE ESTIREN LAS TARJETAS */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-1 content-start">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />

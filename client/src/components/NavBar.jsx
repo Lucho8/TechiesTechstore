@@ -78,7 +78,7 @@ const NavBar = () => {
             />
           </svg>
 
-          {/* GLOBITO ROJO (Solo aparece si hay algo en el carrito) */}
+          
           {cartCount > 0 && (
             <span className="absolute top-0 right-0 bg-violet-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center transform translate-x-1 -translate-y-1">
               {cartCount}

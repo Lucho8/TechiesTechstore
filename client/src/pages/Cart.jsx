@@ -20,7 +20,6 @@ const Cart = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Esta era tu función original, la dejamos igual, pero ahora se va a llamar desde el Modal
   const createOrderInDatabase = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/orders", {
@@ -45,13 +44,12 @@ const Cart = () => {
     }
   };
 
-  // Esta es la nueva función que se ejecuta al tocar "Finalizar Compra"
   const handleCheckoutClick = () => {
     if (!user) {
       toast.error("Necesitás iniciar sesión para finalizar tu compra");
       return navigate("/login", { state: { from: "/cart" } });
     }
-    // Si está logueado, abrimos la ventanita mágica en vez de ir directo al back
+
     setShowPayment(true);
   };
 
@@ -80,7 +78,6 @@ const Cart = () => {
                 key={item.id}
                 className="py-6 flex flex-col sm:flex-row items-center justify-between gap-4"
               >
-                {/* INFO DEL PRODUCTO */}
                 <div className="flex items-center gap-x-6 flex-1 w-full">
                   <img
                     src={item.image}
@@ -95,7 +92,6 @@ const Cart = () => {
                   </div>
                 </div>
 
-                {/* CONTROLES Y TOTALES */}
                 <div className="flex items-center gap-x-6 w-full sm:w-auto justify-between sm:justify-end">
                   <div className="flex items-center bg-slate-900 rounded-lg overflow-hidden border border-slate-600">
                     <button
@@ -157,21 +153,20 @@ const Cart = () => {
               </span>
             </p>
             <button
-              onClick={handleCheckoutClick} // 👈 ACÁ LLAMAMOS A LA FUNCIÓN QUE ABRE EL MODAL
+              onClick={handleCheckoutClick}
               className="bg-violet-600 hover:bg-violet-500 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-violet-600/30 w-full sm:w-auto"
             >
               Finalizar Compra
             </button>
           </div>
 
-          {/* 🪄 EL MODAL SE DIBUJA ACÁ AL FINAL, POR ENCIMA DE TODO */}
           {showPayment && (
             <PaymentModal
-              total={total.toLocaleString()} // Le pasamos el total formateado lindo
+              total={total.toLocaleString()}
               onClose={() => setShowPayment(false)}
               onSuccess={() => {
                 setShowPayment(false);
-                createOrderInDatabase(); // 👈 ACÁ RECIÉN LE PEGAMOS AL BACKEND
+                createOrderInDatabase();
               }}
             />
           )}
