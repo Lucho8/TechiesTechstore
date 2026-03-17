@@ -141,7 +141,13 @@ function ProductDetail() {
         </div>
 
         <div className="md:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-2 leading-tight">
+          <h1
+            className={`font-extrabold text-white mb-2 leading-tight ${
+              product.name.length > 40
+                ? "text-2xl sm:text-3xl"
+                : "text-3xl sm:text-5xl"
+            }`}
+          >
             {product.name}
           </h1>
 
@@ -169,7 +175,8 @@ function ProductDetail() {
             <h3 className="text-lg font-bold text-white mb-2 border-b border-slate-700 pb-2">
               Descripción del producto
             </h3>
-            <p className="text-slate-300 leading-relaxed">
+            {/* El whitespace-pre-wrap hace que se respeten los puntos y aparte */}
+            <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
               {product.description ||
                 "Este producto no tiene una descripción detallada por el momento."}
             </p>
