@@ -137,7 +137,7 @@ function ProductDetail() {
           <img
             src={product.image || "https://via.placeholder.com/600"}
             alt={product.name}
-            className="w-full h-auto max-h-[500px] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+            className="w-full h-auto max-h-125 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
           />
         </div>
 
@@ -260,7 +260,7 @@ function ProductDetail() {
             )}
           </div>
 
-          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-4 max-h-100 overflow-y-auto pr-2 custom-scrollbar">
             {product.reviews?.length === 0 ? (
               <p className="text-slate-400 italic">
                 Todavía no hay reseñas. ¡Sé el primero en opinar!
