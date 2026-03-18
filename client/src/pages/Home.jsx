@@ -34,8 +34,7 @@ function Home() {
         setCategories(cats);
 
         const min = prices.min != null ? Number(prices.min) : 0;
-        const max =
-          prices.max != null && prices.max > 0 ? Number(prices.max) : 100000;
+        const max = prices.max != null && prices.max > 0 ? Number(prices.max) : 100000;
 
         setGlobalMinMax([min, max]);
         setPriceRange([min, max]);
@@ -128,7 +127,6 @@ function Home() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 mb-20">
-      {/* --- HERO BANNER --- */}
       <div className="relative bg-linear-to-r from-violet-900 to-slate-900 rounded-4xl p-8 md:p-14 mb-10 overflow-hidden shadow-2xl border border-violet-500/20">
         <div className="relative z-10 max-w-2xl">
           <span className="inline-block py-1 px-3 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-sm font-bold mb-6 tracking-wide">
@@ -153,12 +151,10 @@ function Home() {
           </button>
         </div>
 
-        {/* Decoración de fondo abstracta */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-violet-600 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse"></div>
         <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-indigo-600 rounded-full mix-blend-multiply filter blur-[100px] opacity-20"></div>
       </div>
 
-      {/* --- TRUST BADGES (Cinta de Beneficios) --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
         <div className="flex items-center gap-5 bg-linear-to-b from-slate-800 to-slate-900/50 p-6 rounded-2xl border border-slate-700/50 hover:border-violet-500/30 transition-colors shadow-lg">
           <div className="text-4xl bg-slate-900 p-4 rounded-xl border border-slate-700 shadow-inner">
@@ -193,7 +189,6 @@ function Home() {
         </div>
       </div>
 
-      {/* --- TÍTULO DEL CATÁLOGO --- */}
       <div
         id="catalogo"
         className="flex items-center justify-between mb-8 border-b border-slate-700/80 pb-4 pt-4"
@@ -203,9 +198,7 @@ function Home() {
         </h2>
       </div>
 
-      {/* --- SECCIÓN PRINCIPAL (Filtros + Grilla) --- */}
       <div className="flex flex-col md:flex-row gap-8">
-        {/* --- SIDEBAR DE FILTROS RENOVADO --- */}
         <div className="w-full md:w-1/4 bg-linear-to-b from-slate-800 to-slate-900 p-6 rounded-3xl border border-slate-700/50 h-fit sticky top-24 shadow-xl shadow-black/40">
           <h2 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
             <svg
