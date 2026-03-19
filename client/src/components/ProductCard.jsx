@@ -1,8 +1,29 @@
-import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useRef } from "react"; //
+import { Link } from "react-router-dom"; //
+import { useCart } from "../context/CartContext"; //
+import toast from "react-hot-toast"; //
 
 function ProductCard({ product }) {
-  const { addToCart } = useCart();
+  const { addToCart } = useCart(); //
+
+  // Referencia para controlar el tiempo entre carteles (no reinicia el componente)
+  const lastToastTime = useRef(0); //
+
+  const handleAddToCart = () => {
+    //
+    addToCart(product); // Sumamos al carrito siempre
+
+    const now = Date.now(); //
+    // Solo mostramos el cartel si pasaron más de 2 segundos (2000ms)
+    if (now - lastToastTime.current > 2000) {
+      //
+      toast.success("¡Agregado al carrito! 🛒", {
+        //
+        position: "bottom-right", //
+      });
+      lastToastTime.current = now; // Guardamos la hora de este cartel
+    }
+  };
 
   return (
     <div className="bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-violet-500/20 transition-all duration-300 border border-slate-700 flex flex-col h-full">
@@ -48,7 +69,7 @@ function ProductCard({ product }) {
           {product.stock > 0 ? (
             <button
               className="bg-violet-600 hover:bg-violet-500 text-white p-2 rounded-lg transition-colors shadow-lg shadow-violet-600/20"
-              onClick={() => addToCart(product)}
+              onClick={handleAddToCart} // Usamos la nueva función con el toast
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

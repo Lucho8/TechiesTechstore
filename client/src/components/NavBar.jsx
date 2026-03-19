@@ -17,7 +17,7 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="bg-slate-800 py-4 px-8 flex items-center shadow-md border-b border-slate-700 justify-between">
+    <nav className="bg-slate-800 py-4 px-8 flex items-center shadow-md border-b border-slate-700 justify-between sticky top-0 z-50">
       <Link
         to="/"
         className="text-2xl font-bold text-blue-400 tracking-wider hover:text-blue-300 transition-colors"

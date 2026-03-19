@@ -34,7 +34,8 @@ function Home() {
         setCategories(cats);
 
         const min = prices.min != null ? Number(prices.min) : 0;
-        const max = prices.max != null && prices.max > 0 ? Number(prices.max) : 100000;
+        const max =
+          prices.max != null && prices.max > 0 ? Number(prices.max) : 100000;
 
         setGlobalMinMax([min, max]);
         setPriceRange([min, max]);
@@ -314,7 +315,6 @@ function Home() {
           </form>
         </div>
 
-        {/* --- GRILLA DE PRODUCTOS --- */}
         <div className="w-full md:w-3/4 flex flex-col">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
