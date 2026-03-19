@@ -164,9 +164,10 @@ const Cart = () => {
 
           {showPayment && (
             <PaymentModal
+              isOpen={showPayment}
               total={total.toLocaleString()}
               onClose={() => setShowPayment(false)}
-              onSuccess={() => {
+              onConfirm={() => {
                 setShowPayment(false);
                 createOrderInDatabase();
               }}

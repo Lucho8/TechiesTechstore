@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import MyOrders from "./MyOrders";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useCart } from "../context/CartContext";
 
 import { API_URL } from "../utils/api";
 
@@ -15,6 +16,15 @@ function Profile() {
   const [editingReview, setEditingReview] = useState(null);
   const [editRating, setEditRating] = useState(5);
   const [editComment, setEditComment] = useState("");
+
+  const navigate = useNavigate();
+  const { clearCart } = useCart();
+
+  const handleLogout = () => {
+    logout();
+    clearCart();
+    navigate("/");
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -120,7 +130,7 @@ function Profile() {
 
         <div className="mt-8 pt-6 border-t border-slate-700">
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="w-full text-left px-4 py-3 rounded-lg font-medium text-red-400 hover:bg-red-500/10 transition-colors"
           >
             🚪 Cerrar Sesión

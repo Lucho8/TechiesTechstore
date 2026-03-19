@@ -6,6 +6,9 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -135,6 +138,45 @@ router.post("/reset-password", async (req, res) => {
   } catch (error) {
     console.error("Error en reset-password:", error);
     res.status(500).json({ error: "Error al actualizar contraseña." });
+  }
+});
+
+router.post("/google", async (req, res) => {
+  const { credential } = req.body;
+
+  try {
+    // 1. Verificamos el token con los servidores de Google
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    // 2. Extraemos los datos del usuario que Google nos confirma
+    const payload = ticket.getPayload();
+    const { email, name } = payload;
+
+    // 3. Buscamos si el usuario ya existe en nuestra base de datos
+    let user = await prisma.user.findUnique({ where: { email } });
+
+    // 4. Si no existe, lo creamos automáticamente (sin password)
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email,
+          name,
+          role: "CLIENT",
+        },
+      });
+    }
+
+    // 5. Devolvemos el usuario al Frontend para que inicie sesión
+    res.status(200).json({
+      message: "Inicio de sesión con Google exitoso",
+      user,
+    });
+  } catch (error) {
+    console.error("🔥 Error en Google Auth:", error);
+    res.status(401).json({ error: "Fallo la autenticación con Google" });
   }
 });
 

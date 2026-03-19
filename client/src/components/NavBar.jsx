@@ -1,10 +1,20 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
+
+  const navigate = useNavigate();
+  const { clearCart } = useCart();
+
+  const handleLogout = () => {
+    logout();
+    clearCart();
+    navigate("/");
+  };
 
   return (
     <nav className="bg-slate-800 py-4 px-8 flex items-center shadow-md border-b border-slate-700 justify-between">
@@ -27,7 +37,7 @@ const NavBar = () => {
                 <span className="font-medium">{user?.name}</span>
               </Link>
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/30 transition-colors border border-red-500/50 cursor-pointer"
               >
                 Log out
@@ -78,7 +88,6 @@ const NavBar = () => {
             />
           </svg>
 
-          
           {cartCount > 0 && (
             <span className="absolute top-0 right-0 bg-violet-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center transform translate-x-1 -translate-y-1">
               {cartCount}

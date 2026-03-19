@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useLocation } from "react-router-dom";
 
 import { API_URL } from "../utils/api";
+import { GoogleLogin } from "@react-oauth/google";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -99,6 +100,46 @@ function Login() {
             Iniciar Sesion
           </button>
         </form>
+
+        <div className="flex items-center my-6">
+          <div className="flex-1 border-t border-slate-700"></div>
+          <span className="px-4 text-slate-500 text-sm">O ingresá con</span>
+          <div className="flex-1 border-t border-slate-700"></div>
+        </div>
+
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                // Mandamos el pase VIP de Google a nuestro backend
+                const res = await fetch(`${API_URL}/api/auth/google`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    credential: credentialResponse.credential,
+                  }),
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                  // Si el backend nos da el OK, lo logueamos en el frontend usando tu AuthContext
+                  login(data.user);
+                  navigate(destination);
+                } else {
+                  setError(data.error || "Fallo el login con Google");
+                }
+              } catch (error) {
+                setError("Error de conexión al servidor");
+              }
+            }}
+            onError={() => {
+              setError("No se pudo conectar con Google");
+            }}
+            theme="filled_black" // Hace que el botón sea oscuro para que pegue con tu diseño
+            shape="pill"
+          />
+        </div>
 
         <p className="text-slate-400 text-center mt-6 text-sm">
           ¿No tenes cuenta?{" "}
