@@ -14,3 +14,12 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+iframe[src^="https://accounts.google.com"] {
+  background-color: transparent !important;
+  color-scheme: light !important;
+}
+
+.S67S5ce-haAclf {
+  background-color: transparent !important;
+}
